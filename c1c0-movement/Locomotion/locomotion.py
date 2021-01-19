@@ -204,5 +204,11 @@ def motor_command(x, y):
 
     #print (send_data)
     motors.write(send_data)
+
+def serial_read():
+
+    recv = motors.read_until(expected=b'0xd20xe20xf2')
+    return R2Protocol.decode(recv)
+
 if __name__ == '__main__':
 	run(1)
