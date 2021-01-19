@@ -19,53 +19,53 @@ def xboxcmd_thread():
 
     while True:
 
-    	lock.acquire()
+        lock.acquire()
         locomotion.run(1)
         lock.release()
 
 def keycmd_thread():
 
-	while True:
+    while True:
 
-		lock.acquire()
-		locomotion.key_run(1)
-		lock.release()
+        lock.acquire()
+        locomotion.key_run(1)
+        lock.release()
 
 def read_thread():
 	
-	while True:
+    while True:
 
-		lock.acquire()
-		info = locomotion.serial_read()
-		lock.release()
+        lock.acquire()
+        info = locomotion.serial_read()
+        lock.release()
 
-		if info == (-1, -1, -1): # check for invalid message
-			print('ERR: Could not decode message!')
+        if info == (-1, -1, -1): # check for invalid message
+            print('ERR: Could not decode message!')
 
-		elif info[2] == 0: # check for incorrect checksum
-			print('ERR: Invalid checksum!')
+        elif info[2] == 0: # check for incorrect checksum
+            print('ERR: Invalid checksum!')
 
-		else:
-			msgtype = info[0]
-			msg = info[1]
-			print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
+        else:
+            msgtype = info[0]
+            msg = info[1]
+            print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
 
 if __name__ == '__main__':
 
-	t1 = threading.Thread(target=xboxcmd_thread)
-	t2 = threading.Thread(target=keycmd_thread)
-	t3 = threading.Thread(target=read_thread)
+    t1 = threading.Thread(target=xboxcmd_thread)
+    t2 = threading.Thread(target=keycmd_thread)
+    t3 = threading.Thread(target=read_thread)
 
-	if args.ctrl == 'xbox':
-		t1.start()
-	elif args.ctrl == 'keyboard':
-		t2.start()
-	else:
-		print("runlocomotion.py: Incorrect usage - please give `xbox` or `keyboard` argument")
-		exit()
+    if args.ctrl == 'xbox':
+        t1.start()
+    elif args.ctrl == 'keyboard':
+        t2.start()
+    else:
+        print("runlocomotion.py: Incorrect usage - please give `xbox` or `keyboard` argument")
+        exit()
 
-	# start the read thread
-	t3.start()
+    # start the read thread
+    t3.start()
 
 
 
