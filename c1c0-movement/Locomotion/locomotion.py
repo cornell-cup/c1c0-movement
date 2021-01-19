@@ -176,6 +176,21 @@ def key_run(distance):
         motor_command(x,y)
         head_command(degree)
         #print("x = %d y = %d" % (x,y))
+
+        # read response and report feedback
+        info = serial_read()
+        if info == (-1, -1, -1): # check for invalid message
+            print('ERR: Could not decode message!')
+
+        elif info[2] == 0: # check for incorrect checksum
+            print('ERR: Invalid checksum!')
+
+        else:
+            msgtype = info[0]
+            msg = info[1]
+            print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
+
+
     keyboard.press('esc')
     keyboard.release('esc')
 
@@ -213,8 +228,8 @@ def shake_head():
     head_command(0)
 
 def motor_command(x, y):
-    #print(x)
-    #print(y)
+    print(x)
+    print(y)
     global motors
     xs = int(255 * clamp(float(x*50), -1.0, 1.0))
     nx = int(255 * clamp(float((x+1)*50), -1.0, 1.0))
