@@ -3,18 +3,33 @@
 # to HeadLocomotion, and one which reads from
 # the serial line to assure data is being received
 
+# accepts argument for whether to run with xbox or keyboard
+
 import threading
 import locomotion
+import argparse
+
+parser = argparse.ArgumentParser(description='Run locomotion w/ xbox controller or keyboard')
+parser.add_argument("ctrl", help="Control C1C0 with `keyboard` or `xbox`", type=str)
+args = parser.parse_args()
 
 lock = threading.Lock()
 
-def cmd_thread():
+def xboxcmd_thread():
 
     while True:
 
     	lock.acquire()
         locomotion.run(1)
         lock.release()
+
+def keycmd_thread():
+
+	while True:
+
+		lock.acquire()
+		locomotion.key_run(1)
+		lock.release()
 
 def read_thread():
 	
@@ -37,10 +52,23 @@ def read_thread():
 
 if __name__ == '__main__':
 
-	t1 = threading.Thread(target=cmd_thread)
-	t2 = threading.Thread(target=read_thread)
+	t1 = threading.Thread(target=xboxcmd_thread)
+	t2 = threading.Thread(target=keycmd_thread)
+	t3 = threading.Thread(target=read_thread)
 
-	t1.start()
-	t2.start()
+	if args.ctrl == 'xbox':
+		t1.start()
+	elif args.ctrl == 'keyboard':
+		t2.start()
+	else:
+		print("runlocomotion.py: Incorrect usage - please give `xbox` or `keyboard` argument")
+		exit()
+
+	# start the read thread
+	t3.start()
+
+
+
+
 
 

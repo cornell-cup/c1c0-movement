@@ -11,6 +11,7 @@ import traceback
 import readchar
 import sys
 import json
+import keyboard
 #import terabee
 #import lidar
 from threading import Thread
@@ -148,6 +149,33 @@ def run(distance):
             #motor_command(0,0)
             #break
 
+def key_run(distance):
+    keyboard.on_press(key_press)
+    while not keyboard.is_pressed('down'):
+        time.sleep(0.1)
+        degree = 0
+        x = 0
+        y = 0
+
+        if keyboard.is_pressed('right'):
+            degree = 1
+        if keyboard.is_pressed('left'):
+            degree = -1
+        if keyboard.is_pressed('a'):
+            x -= 1
+        if keyboard.is_pressed('d'):
+            x += 1
+        if keyboard.is_pressed('w'):
+            y += 1
+        if keyboard.is_pressed('d'):
+            y -= 1
+        motorcommand(x,y)
+        headcommand(degree)
+        #print("x = %d y = %d" % (x,y))
+    keyboard.press('esc')
+    keyboard.release('esc')
+
+# !!! This function doesn't really work. Use key_run instead !!! #
 def control():
     command = input()
     while(True):
@@ -162,6 +190,7 @@ def control():
         if command == "x":
             motor_command(0,0)
             break
+# !!! ----------------------------------------------------- !!! #
 
 def head_command(degree):
     #print(degree)
