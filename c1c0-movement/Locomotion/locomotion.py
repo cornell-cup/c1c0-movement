@@ -56,7 +56,12 @@ def clamp(x, l, u):
     return u
   return x
 
-motors = serial.Serial('/dev/locomotion', baudrate=115200, timeout=1)
+# define Jetson-used /dev for serial port
+motors = serial.Serial(
+    port = '/dev/ttyTHS1', 
+    baudrate = 115200, 
+    timeout = 1
+)
 
 
 def signal_handler(signal, frame):
