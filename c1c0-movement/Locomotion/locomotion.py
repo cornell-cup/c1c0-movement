@@ -213,8 +213,8 @@ def shake_head():
     head_command(0)
 
 def motor_command(x, y):
-    print(x)
-    print(y)
+    #print(x)
+    #print(y)
     global motors
     xs = int(255 * clamp(float(x*50), -1.0, 1.0))
     nx = int(255 * clamp(float((x+1)*50), -1.0, 1.0))
