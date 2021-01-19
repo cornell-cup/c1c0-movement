@@ -255,7 +255,7 @@ def motor_command(x, y):
 
 def serial_read():
 
-    recv = motors.read_until(expected=b'0xd20xe20xf2')
+    recv = motors.read_until(expected=b'\xd2\xe2\xf2')
     return R2Protocol.decode(recv)
 
 if __name__ == '__main__':
