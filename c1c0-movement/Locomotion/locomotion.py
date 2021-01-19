@@ -173,8 +173,8 @@ def key_run(distance):
             y += 1
         if keyboard.is_pressed('d'):
             y -= 1
-        motorcommand(x,y)
-        headcommand(degree)
+        motor_command(x,y)
+        head_command(degree)
         #print("x = %d y = %d" % (x,y))
     keyboard.press('esc')
     keyboard.release('esc')
