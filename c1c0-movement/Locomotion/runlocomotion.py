@@ -8,6 +8,7 @@
 import threading
 import locomotion
 import argparse
+import sys
 
 parser = argparse.ArgumentParser(description='Run locomotion w/ xbox controller or keyboard')
 parser.add_argument("ctrl", help="Control C1C0 with `keyboard` or `xbox`", type=str)
@@ -40,15 +41,16 @@ def read_thread():
         lock.release()
 
         if info == (-1, -1, -1): # check for invalid message
-            print('ERR: Could not decode message!')
+            sys.stderr.write('ERR: Could not decode message!')
 
         elif info[2] == 0: # check for incorrect checksum
-            print('ERR: Invalid checksum!')
+            sys.stderr.write('ERR: Invalid checksum!')
 
         else:
             msgtype = info[0]
             msg = info[1]
-            print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
+            out = 'RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg)
+            sys.stderr.write(out)
 
 if __name__ == '__main__':
 
