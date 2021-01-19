@@ -149,6 +149,10 @@ def run(distance):
             #motor_command(0,0)
             #break
 
+# helper for key_run
+def key_press(key):
+    print(key.name)
+
 def key_run(distance):
     keyboard.on_press(key_press)
     while not keyboard.is_pressed('down'):
