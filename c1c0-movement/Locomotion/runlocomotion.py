@@ -32,30 +32,9 @@ def keycmd_thread():
     while True:
 
     	# catch keyboard exceptions
-        try:
-	        lock.acquire()
-	        locomotion.key_run(1)
-	        lock.release()
-        except:
-	    	# ensure that the motors get turned off when stopping
-            print("Exiting...")
-            lock.acquire()
-            locomotion.motor_command(0,0)
-            locomotion.head_command(0)
-            info = locomotion.serial_read()
-            if info == (-1, -1, -1): # check for invalid message
-                print('ERR: Could not decode message!')
-
-            elif info[2] == 0: # check for incorrect checksum
-                print('ERR: Invalid checksum!')
-
-            else:
-                msgtype = info[0]
-                msg = info[1]
-                print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
-            lock.release()
-            exit()
-
+	    lock.acquire()
+	    locomotion.key_run(1)
+	    lock.release()
 
 def read_thread():
 	
@@ -86,29 +65,6 @@ if __name__ == '__main__':
         t1.start()
     elif args.ctrl == 'keyboard':
         t2.start()
-        while True:
-            try:
-                pass
-            except:
-                print("Exiting...")
-                lock.acquire()
-                locomotion.motor_command(0,0)
-                locomotion.head_command(0)
-
-                info = locomotion.serial_read()
-                if info == (-1, -1, -1): # check for invalid message
-                    print('ERR: Could not decode message!')
-
-                elif info[2] == 0: # check for incorrect checksum
-                    print('ERR: Invalid checksum!')
-
-                else:
-                    msgtype = info[0]
-                    msg = info[1]
-                    print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
-                lock.release()
-                t2.join()
-                exit()
     else:
         print("runlocomotion.py: Incorrect usage - please give `xbox` or `keyboard` argument")
         exit()
