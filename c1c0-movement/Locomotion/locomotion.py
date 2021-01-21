@@ -181,13 +181,10 @@ def key_run(distance):
             degree = -1
         if keyboard.is_pressed('a'):
             x -= 1
-            
         if keyboard.is_pressed('d'):
-            x += 1
-            
+            x += 1            
         if keyboard.is_pressed('w'):
-            y += 1
-            
+            y += 1          
         if keyboard.is_pressed('s'):
             y -= 1
             
@@ -195,18 +192,19 @@ def key_run(distance):
         head_command(degree)
         #print("x = %d y = %d" % (x,y))
 
-        # read response and report feedback
-        info = serial_read()
-        if info == (-1, -1, -1): # check for invalid message
-            print('ERR: Could not decode message!')
+        # read response and report feedback twice, one for each command sent
+        for i in range(0,2):
+            info = serial_read()
+            if info == (-1, -1, -1): # check for invalid message
+                print('ERR: Could not decode message!')
 
-        elif info[2] == 0: # check for incorrect checksum
-            print('ERR: Invalid checksum!')
+            elif info[2] == 0: # check for incorrect checksum
+                print('ERR: Invalid checksum!')
 
-        else:
-            msgtype = info[0]
-            msg = info[1]
-            print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
+            else:
+                msgtype = info[0]
+                msg = info[1]
+                print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
 
 
     keyboard.press('esc')
