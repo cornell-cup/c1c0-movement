@@ -169,14 +169,18 @@ def key_run(distance):
         if keyboard.is_pressed('left'):
             degree = -1
         if keyboard.is_pressed('a'):
-            x -= 1
+            #x -= 1
+            motor_command(1, -1)
         if keyboard.is_pressed('d'):
-            x += 1
+            #x += 1
+            motor_command(-1, 1)
         if keyboard.is_pressed('w'):
-            y += 1
-        if keyboard.is_pressed('d'):
-            y -= 1
-        motor_command(x,y)
+            #y += 1
+            motor_command(-1, -1)
+        if keyboard.is_pressed('s'):
+            #y -= 1
+            motor_command(1, 1)
+        #motor_command(x,y)
         head_command(degree)
         #print("x = %d y = %d" % (x,y))
 
@@ -262,4 +266,4 @@ def serial_read():
     return R2Protocol.decode(recv)
 
 if __name__ == '__main__':
-	run(1)
+    run(1)
