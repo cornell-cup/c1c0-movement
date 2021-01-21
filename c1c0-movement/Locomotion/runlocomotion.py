@@ -99,8 +99,8 @@ if __name__ == '__main__':
                 if info == (-1, -1, -1): # check for invalid message
                     print('ERR: Could not decode message!')
 
-                    elif info[2] == 0: # check for incorrect checksum
-                        print('ERR: Invalid checksum!')
+                elif info[2] == 0: # check for incorrect checksum
+                    print('ERR: Invalid checksum!')
 
                 else:
                     msgtype = info[0]
