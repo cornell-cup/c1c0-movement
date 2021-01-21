@@ -38,11 +38,11 @@ def keycmd_thread():
 	        lock.release()
         except:
 	    	# ensure that the motors get turned off when stopping
-	        print("Exiting...")
-	        lock.acquire()
-	        locomotion.motor_command(0,0)
-	        locomotion.head_command(0)
-	        info = locomotion.serial_read()
+            print("Exiting...")
+            lock.acquire()
+            locomotion.motor_command(0,0)
+            locomotion.head_command(0)
+            info = locomotion.serial_read()
             if info == (-1, -1, -1): # check for invalid message
                 print('ERR: Could not decode message!')
 
@@ -53,8 +53,8 @@ def keycmd_thread():
                 msgtype = info[0]
                 msg = info[1]
                 print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
-	        lock.release()
-	        exit()
+            lock.release()
+            exit()
 
 
 def read_thread():
