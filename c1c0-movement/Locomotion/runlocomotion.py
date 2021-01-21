@@ -5,6 +5,10 @@
 
 # accepts argument for whether to run with xbox or keyboard
 
+# there is a lock here intended for the multithreaded read/command threads,
+# but the command thread currently reads itself so the lock/multiple threads
+# may not actually be necessary and will probably be removed
+
 import threading
 import locomotion
 import argparse
@@ -27,9 +31,20 @@ def keycmd_thread():
 
     while True:
 
-        lock.acquire()
-        locomotion.key_run(1)
-        lock.release()
+    	# catch keyboard exceptions
+    	try:
+	        lock.acquire()
+	        locomotion.key_run(1)
+	        lock.release()
+	    except:
+	    	# ensure that the motors get turned off when stopping
+	    	print("Exiting...")
+	    	lock.acquire()
+	    	locomotion.motor_command(0,0)
+	    	locomotion.head_command(0)
+	    	lock.release()
+	    	exit()
+
 
 def read_thread():
 	
