@@ -45,7 +45,7 @@ import R2Protocol2 as R2Protocol
 #BUFFER_SIZE = 64
 
 MOVE_DATA = R2Protocol.encode(b"BM", b"\x00a\x00a")
-STOP_DATA = R2Protocol.encode(b"BM", b"\x00\x19\x00\x19")
+STOP_DATA = R2Protocol.encode(b"STOP", b"")
 
 def dir(x):
   return 1 if x < 0 else 0
