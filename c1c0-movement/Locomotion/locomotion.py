@@ -75,13 +75,13 @@ def signal_handler(signal, frame):
   if info == (-1, -1, -1): # check for invalid message
     print('ERR: Could not decode message!')
 
-    elif info[2] == 0: # check for incorrect checksum
-      print('ERR: Invalid checksum!')
+  elif info[2] == 0: # check for incorrect checksum
+    print('ERR: Invalid checksum!')
 
-    else:
-      msgtype = info[0]
-      msg = info[1]
-      print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
+  else:
+    msgtype = info[0]
+    msg = info[1]
+    print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
   motors.close()
   sys.exit(0)
 
