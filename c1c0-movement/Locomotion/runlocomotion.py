@@ -32,11 +32,11 @@ def keycmd_thread():
     while True:
 
     	# catch keyboard exceptions
-    	try:
+        try:
 	        lock.acquire()
 	        locomotion.key_run(1)
 	        lock.release()
-	    except:
+        except:
 	    	# ensure that the motors get turned off when stopping
 	        print("Exiting...")
 	        lock.acquire()
