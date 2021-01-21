@@ -265,5 +265,5 @@ def serial_read():
     recv = motors.read_until(expected=b'\xd2\xe2\xf2')
     return R2Protocol.decode(recv)
 
-if __name__ == '__main__':
-    run(1)
+#if __name__ == '__main__':
+#    run(1)

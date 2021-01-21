@@ -75,6 +75,16 @@ if __name__ == '__main__':
         t1.start()
     elif args.ctrl == 'keyboard':
         t2.start()
+        while True:
+            try:
+                pass
+            except:
+                print("Exiting...")
+	            lock.acquire()
+	            locomotion.motor_command(0,0)
+	            locomotion.head_command(0)
+	            lock.release()
+	            exit()
     else:
         print("runlocomotion.py: Incorrect usage - please give `xbox` or `keyboard` argument")
         exit()
