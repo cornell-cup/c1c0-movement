@@ -38,12 +38,12 @@ def keycmd_thread():
 	        lock.release()
 	    except:
 	    	# ensure that the motors get turned off when stopping
-	    	print("Exiting...")
-	    	lock.acquire()
-	    	locomotion.motor_command(0,0)
-	    	locomotion.head_command(0)
-	    	lock.release()
-	    	exit()
+	        print("Exiting...")
+	        lock.acquire()
+	        locomotion.motor_command(0,0)
+	        locomotion.head_command(0)
+	        lock.release()
+	        exit()
 
 
 def read_thread():
