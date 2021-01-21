@@ -61,7 +61,10 @@ def clamp(x, l, u):
 motors = serial.Serial(
     port = '/dev/ttyTHS1', 
     baudrate = 115200, 
-    timeout = 1
+    timeout = 1,
+    bytesize=serial.EIGHTBITS,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE
 )
 
 
