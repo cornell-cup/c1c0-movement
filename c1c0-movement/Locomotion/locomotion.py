@@ -162,6 +162,20 @@ def run(distance):
         #if lidar.run_lidar() == False: #stop motors if lidar reads something within 12 inches
             #motor_command(0,0)
             #break
+            
+        for i in range(0,2):
+            info = serial_read()
+            if info == (-1, -1, -1): # check for invalid message
+                print('ERR: Could not decode message!')
+
+            elif info[2] == 0: # check for incorrect checksum
+                print('ERR: Invalid checksum!')
+
+            else:
+                msgtype = info[0]
+                msg = info[1]
+                print('RECV - Type: '+ str(msgtype) + ' | Message: ' + str(msg))
+
 
 # helper for key_run
 def key_press(key):
