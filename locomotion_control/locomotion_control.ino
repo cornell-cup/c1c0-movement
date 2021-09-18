@@ -16,11 +16,11 @@ void setup() {
 }
 
 void loop() {
-  analogWrite(3, 25); //253 max
+  analogWrite(3,80); //253 max
   digitalWrite(8, HIGH);
   int speed = analogRead(A0); //rpm scaled by 15
-  int avspeed = analogRead(A1);
+  //int avspeed = analogRead(A1);
   Serial.println(speed);
-  Serial.println(avspeed);
+  //Serial.println(avspeed);
   Serial.println("");
 }
