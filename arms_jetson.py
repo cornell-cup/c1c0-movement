@@ -6,9 +6,6 @@ ser = serial.Serial(
 	baudrate = 9600,
 )
 
-
-
-
 def printMoves(x):
 	print("J" + str(x+1) + ": " + str(s[x]))
 
@@ -19,13 +16,21 @@ endseq = (65533).to_bytes(2, 'big')
 
 while(1):
 	print(ser.in_waiting)
-	serial1 = ser.read(18)
+	serial1 = ser.read(19)
 	ser.reset_input_buffer()
 	print(serial1)
-
-	start = serial1.index(startseq)
-	serial1[start+8] == endseq
-	s = serial1[start+2:start+8]
+	
+	try:
+		start = serial1.index(startseq)
+		serial1[start+8] == endseq
+		s = serial1[start+2:start+8]
+	except:
+		time.sleep(3)
+		serial1 = ser.read(19)
+		ser.reset_input_buffer()
+		start = serial1.index(startseq)
+		serial1[start+8] == endseq
+		s = serial1[start+2:start+8]
 	
 	print(s)
 
