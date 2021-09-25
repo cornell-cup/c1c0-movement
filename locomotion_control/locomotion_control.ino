@@ -7,24 +7,26 @@
   
  */
 
- //1 = left, 2 = right
-int pwmPin1 = 3;
-int dirPin1 = 8;
-int rpmPin1 = A0;
-int pwmPin2 = 5;
-int dirPin2 = 7;
-int rpmPin2 = A1;
+#define cw(x) ((x) <= 0 ? 0 : 1)
+
+
+int pwmPinR = 3;
+int dirPinR = 8;
+int rpmPinR = A0;
+int pwmPinL = 5;
+int dirPinL = 7;
+int rpmPinL = A1;
 int maxrpm = 8000; //placeholder
  
 
 void setup() {
-  pinMode(pwmPin1, OUTPUT);
-  pinMode(dirPin1, OUTPUT);
-  pinMode(rpmPin1, INPUT);
-  pinMode(pwmPin2, OUTPUT);
-  pinMode(dirPin2, OUTPUT);
-  pinMode(rpmPin2, INPUT);
-//  pinMode(A1, INPUT);
+  pinMode(pwmPinR, OUTPUT);
+  pinMode(dirPinR, OUTPUT);
+  pinMode(rpmPinR, INPUT);
+  pinMode(pwmPinL, OUTPUT);
+  pinMode(dirPinL, OUTPUT);
+  pinMode(rpmPinL, INPUT);
+  
   Serial.begin(9600);
 }
 
