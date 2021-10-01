@@ -5,11 +5,11 @@ ser = serial.Serial(
 	port = '/dev/ttyTHS1',
 	baudrate = 9600,
 )
+type1 = "stuf"
+data = [1,2,3]
 while(1):
 	for i in range(6):
-		data = i
 		print(data)
-		msg = r2p.encode(12,data)
+		msg = r2p.encode(bytes(type1, 'utf-8'),bytearray(data))
 		ser.write(msg)
-		print(bytes[data])
 		time.sleep(1)
