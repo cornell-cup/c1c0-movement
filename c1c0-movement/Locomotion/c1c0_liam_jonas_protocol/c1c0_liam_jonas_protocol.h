@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
+
 #define R2P_HEADER_SIZE 17
 
 static const uint16_t r2p_crc16_table[256] = {
