@@ -7,7 +7,7 @@
   
  */
 #include <PID_v1.h> //https://playground.arduino.cc/Code/PIDLibrary/
-#include "R2Protocol.h"
+//#include "R2Protocol.h"
 
 /* Define our domains:
  *  Analog domain: [0, 1024] where [0, 512] indicates backwards and [512, 1024] is forwards. 512 means the motor should not be moving
@@ -40,7 +40,7 @@ int rpm_pin_L = A1;
 int max_pwm = 253;
 
 // in PID domain
-float pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
+double pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
 
 // in input domain
 float left;
@@ -58,6 +58,9 @@ int right_pwm;
 
 // input string to receive from Jetson
 String input_str;
+
+PID *pid_R;
+PID *pid_L;
  
 
 void setup() {
@@ -79,14 +82,14 @@ void setup() {
   pid_setpoint_R = 0.0;
 
   // create initial PID controllers - input, output, setpoint, tuning parameters
-  PID *pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R, 2, 5, 1, DIRECT);
-  PID *pid_L = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L, 2, 5, 1, DIRECT);
+  pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R, 2, 5, 1, DIRECT);
+  pid_L = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L, 2, 5, 1, DIRECT);
 
   // turn PID on and set sample time in ms
-  pid_R.SetMode(AUTOMATIC);
-  pid_R.SetSampleTime(200);
-  pid_L.SetMode(AUTOMATIC);
-  pid_L.SetSampleTime(200);
+  pid_R->SetMode(AUTOMATIC);
+  pid_R->SetSampleTime(200);
+  pid_L->SetMode(AUTOMATIC);
+  pid_L->SetSampleTime(200);
 
   // init as not moving
   left = 0.0;
@@ -108,8 +111,8 @@ void loop() {
 //    left = input_str.substring(1, input_str.indexOf(',')).toFloat();
 //    right = input_str.substring(input_str.indexOf(',')+1, input_str.length()-1).toFloat();
 //  }
-  left = 0.5
-  right = 0.5
+  left = 0.5;
+  right = 0.5;
 
   // set directions
   cw_R = (right > 0);
@@ -126,11 +129,11 @@ void loop() {
   // create new PIDs if input from Jetson has changed
   if (left != prev_left){
     delete pid_L;
-    PID *pid_L = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
+    pid_L = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
   }
   if (right != prev_right){
     delete pid_R;
-    PID *pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
+    pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
   }
   
   // write pwm to drivers
@@ -150,8 +153,8 @@ void loop() {
   prev_right = right;
 
   // must call compute pid every loop - will only actually run every SetSampleTime ms
-  pid_R.Compute();
-  pid_L.Compute();
+  pid_R->Compute();
+  pid_L->Compute();
 }
 
 
