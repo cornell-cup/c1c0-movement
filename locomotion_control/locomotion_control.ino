@@ -86,10 +86,10 @@ void setup() {
   // turn PID on and set sample time in ms
   pid_R->SetMode(AUTOMATIC);
   pid_R->SetSampleTime(200);
-  pid_R->SetOutputLimits(-0.1,0.1);
+  pid_R->SetOutputLimits(-0.01,0.01);
   pid_L->SetMode(AUTOMATIC);
   pid_L->SetSampleTime(200);
-  pid_L->SetOutputLimits(-0.1,0.1);
+  pid_L->SetOutputLimits(-0.01,0.01);
 
 
   // init as not moving
@@ -130,14 +130,14 @@ void loop() {
 //  pid_input_R = 0.2;
   
   // write pwm to drivers
-  left_pwm = PID_to_pwm(pid_output_L+pid_input_L);
-  right_pwm = PID_to_pwm(pid_output_R+pid_input_R);
+  left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
+  right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
 
   
 //  Serial.println(pid_input_L);
 //  Serial.println(pid_output_L);
-//  Serial.println(left_pwm);
-//  Serial.println(right_pwm);
+//  Serial.println("Left PWM: " + left_pwm);
+//  Serial.println("Right PWM: " + right_pwm);
 
 
   analogWrite(pwm_pin_L,left_pwm); //253 max
