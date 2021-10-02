@@ -18,36 +18,42 @@
  */
 
 //Define Variables we'll be connecting to
-float pid_setpointL, pid_setpointR, pid_inputL, pid_inputR, pid_outputL, pid_outputR;
+float pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
 
 int dir
 
-int pwmPinR = 11;
-int cwPinR = 12;
-int ccwPinR = 13;
-int rpmPinR = A0;
-int pwmPinL = 3;
-int cwPinL = 7;
-int ccwPinL = 8;
-int rpmPinL = A1;
-int maxpwm = 253;
+int pwm_pin_R = 11;
+int pwm_pin_L = 3;
+int cw_pin_R = 12;
+int ccw_pin_R = 13;
+int rpm_pin_R = A0;
+int cw_pin_L = 7;
+int ccw_pin_L = 8;
+int rpm_pin_L = A1;
+int max_pwm = 253;
 
 float left;
 float right;
 float prev_left;
 float prev_right;
 
+bool cw_R;
+bool cw_L;
+
+int left_pwm;
+int right_pwm;
+
  
 
 void setup() {
-  pinMode(pwmPinR, OUTPUT);
-  pinMode(cwPinR, OUTPUT);
-  pinMode(ccwPinR, OUTPUT);
-  pinMode(rpmPinR, INPUT);
-  pinMode(pwmPinL, OUTPUT);
-  pinMode(cwPinL, OUTPUT);
-  pinMode(ccwPinL, OUTPUT);
-  pinMode(rpmPinL, INPUT);
+  pinMode(pwm_pin_R, OUTPUT);
+  pinMode(cw_pin_R, OUTPUT);
+  pinMode(ccw_pin_R, OUTPUT);
+  pinMode(rpm_pin_R, INPUT);
+  pinMode(pwm_pin_L, OUTPUT);
+  pinMode(cw_pin_L, OUTPUT);
+  pinMode(ccw_pin_L, OUTPUT);
+  pinMode(rpm_pin_L, INPUT);
 
 //  //initialize the variables we're linked to
 //  pid_inputL = analogRead(rpm);
@@ -81,16 +87,16 @@ void loop() {
   right = 0.5;
 
   // scale setpoints to analog values
-  pid_setpointL = left;
-  pid_setpointR = right;
+  pid_setpoint_L = left;
+  pid_setpoint_R = right;
 
   // take in RPM input
-  pid_inputL = analogRead(rpmPinL);
-  pid_inputR = analogRead(rpmPinR);
+  pid_input_L = analogRead(rpm_pin_L);
+  pid_input_R = analogRead(rpm_pin_R);
 
   //Specify the links and initial tuning parameters
-  PID *pidL = new PID(&pid_inputL, &pid_outputL, &pid_setpointL,2,5,1, DIRECT);
-  PID *pidR = new PID(&pid_inputR, &pid_outputR, &pid_setpointR,2,5,1, DIRECT);
+  PID *pidL = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
+  PID *pidR = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
 
 
 
@@ -100,30 +106,30 @@ void loop() {
 
   if (left != prev_left){
     delete pidL;
-    PID *pidL = new PID(&pid_input, &pid_output, &pid_setpoint,2,5,1, DIRECT);
+    PID *pidL = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
   }
   if (right != prev_right){
     delete pidR;
-    PID *pidR = new PID(&pid_input, &pid_output, &pid_setpoint,2,5,1, DIRECT);
+    PID *pidR = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
   }
 
-  bool cwR = (right > 0);
-  bool cwL = (left < 0);
+  cw_R = (right > 0);
+  cw_L = (left < 0);
   
-  int leftpwm = left*maxpwm;
-  int rightpwm = right*maxpwm;
-  analogWrite(pwmPinL,leftpwm); //253 max
-  analogWrite(pwmPinR,rightpwm); //253 max
-  digitalWrite(cwPinR, cwR); //Direction --forward
-  digitalWrite(cwPinL, cwL); //Direction
-  digitalWrite(ccwPinR, ~cwR); //Direction
-  digitalWrite(ccwPinL, ~cwL); //Direction
+  left_pwm = left*max_pwm;
+  right_pwm = right*max_pwm;
+  analogWrite(pwm_pin_L,left_pwm); //253 max
+  analogWrite(pwm_pin_R,right_pwm); //253 max
+  digitalWrite(cw_pin_R, cw_R); //Direction --forward
+  digitalWrite(cw_pin_L, cw_L); //Direction
+  digitalWrite(ccw_pin_R, ~cw_R); //Direction
+  digitalWrite(ccw_pin_L, ~cw_L); //Direction
     
-  pid_input = anlgToRPM(analogRead(rpmPinR));
+  pid_input = anlgToRPM(analogRead(rpm_pin_R));
   pidR.Compute();
   analogWrite(3,pid_output);
 
-  pid_input = anlgToRPM(analogRead(rpmPinL));
+  pid_input = anlgToRPM(analogRead(rpm_pin_L));
   pidL.Compute();
   analogWrite(3,pid_output);
 
