@@ -34,8 +34,8 @@ int pwm_pin_L = 3;
 int cw_pin_R = 12;
 int ccw_pin_R = 13;
 int rpm_pin_R = A0;
-int cw_pin_L = 7;
-int ccw_pin_L = 8;
+int cw_pin_L = 8;
+int ccw_pin_L = 7;
 int rpm_pin_L = A1;
 int max_pwm = 253;
 
