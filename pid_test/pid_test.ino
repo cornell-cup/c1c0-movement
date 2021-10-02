@@ -20,6 +20,7 @@ void setup()
   //turn the PID on
   myPID.SetMode(AUTOMATIC); //turn PID on
   myPID.SetSampleTime(200); //in ms
+  Serial.begin(9600);
 }
 
 void loop()
@@ -27,4 +28,5 @@ void loop()
   Input = analogRead(0);
   myPID.Compute();
   analogWrite(3,Output);
+  Serial.println(Output);
 }

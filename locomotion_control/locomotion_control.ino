@@ -25,7 +25,7 @@
 */
 
 // domain change functions
-#define analog_to_PID(anlg) ( (anlg/512) -1 )
+#define analog_to_PID(anlg) abs(((anlg/512) - 1)) 
 #define PID_to_pwm(PID) (PID*max_pwm)
 
 // pin defintions
@@ -76,6 +76,8 @@ void setup() {
   // init setpoint as not moving
   pid_setpoint_L = 0.0;
   pid_setpoint_R = 0.0;
+//  pid_setpoint_L = 0.2;
+//  pid_setpoint_R = 0.2;
 
   // create initial PID controllers - input, output, setpoint, tuning parameters
   pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R, 2, 5, 1, DIRECT);
@@ -84,8 +86,11 @@ void setup() {
   // turn PID on and set sample time in ms
   pid_R->SetMode(AUTOMATIC);
   pid_R->SetSampleTime(200);
+  pid_R->SetOutputLimits(-0.1,0.1);
   pid_L->SetMode(AUTOMATIC);
   pid_L->SetSampleTime(200);
+  pid_L->SetOutputLimits(-0.1,0.1);
+
 
   // init as not moving
   left = 0.0;
@@ -107,8 +112,8 @@ void loop() {
 //    left = input_str.substring(1, input_str.indexOf(',')).toFloat();
 //    right = input_str.substring(input_str.indexOf(',')+1, input_str.length()-1).toFloat();
 //  }
-  left = 0.5;
-  right = 0.5;
+  left = 0.2;
+  right = 0.2;
 
   // set directions
   cw_R = (right > 0);
@@ -121,20 +126,20 @@ void loop() {
   // take in RPM input from driver - analog to PID
   pid_input_L = analog_to_PID(analogRead(rpm_pin_L));
   pid_input_R = analog_to_PID(analogRead(rpm_pin_R));
-
-  // create new PIDs if input from Jetson has changed
-  if (left != prev_left){
-    delete pid_L;
-    pid_L = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
-  }
-  if (right != prev_right){
-    delete pid_R;
-    pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
-  }
+//  pid_input_L = 0.2;
+//  pid_input_R = 0.2;
   
   // write pwm to drivers
-  left_pwm = PID_to_pwm(pid_output_L);
-  right_pwm = PID_to_pwm(pid_output_R);
+  left_pwm = PID_to_pwm(pid_output_L+pid_input_L);
+  right_pwm = PID_to_pwm(pid_output_R+pid_input_R);
+
+  
+//  Serial.println(pid_input_L);
+//  Serial.println(pid_output_L);
+//  Serial.println(left_pwm);
+//  Serial.println(right_pwm);
+
+
   analogWrite(pwm_pin_L,left_pwm); //253 max
   analogWrite(pwm_pin_R,right_pwm); //253 max
 
