@@ -7,21 +7,28 @@
   
  */
 #include <PID_v1.h> //https://playground.arduino.cc/Code/PIDLibrary/
+#include "R2Protocol.h"
 
 /* Define our domains:
  *  Analog domain: [0, 1024] where [0, 512] indicates backwards and [512, 1024] is forwards. 512 means the motor should not be moving
  *  PID domain: [0.0, 1.0] which is the magnitude of the motor speed. 1.0 is the max speed. 0.0 is no speed.
- *  Input domain: [-1.0, 1.0] where a -1.0 indicates full speed backwards and 1.0 indicates full speed forwards. 0.0 is no movement
+ *  Input from path planning domain: [-1.0, 1.0] where a -1.0 indicates full speed backwards and 1.0 indicates full speed forwards. 0.0 is no movement
  *  PWM domain: [0, maxpwm] which is sent to the driver to indicate how fast we want motor to move. 255 is max speed
  *  
  *  We will need to convert between these domains while implementing PID control.
  */
 
-//Define Variables we'll be connecting to
-float pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
+/*     (-,-)     
+    |__ | | __|  
+       |   |     
+     <_     _>   
+*/
 
-int dir
+// domain change functions
+#define analog_to_PID(anlg) ( (anlg/512) -1 )
+#define PID_to_pwm(PID) (PID*max_pwm)
 
+// pin defintions
 int pwm_pin_R = 11;
 int pwm_pin_L = 3;
 int cw_pin_R = 12;
@@ -32,17 +39,25 @@ int ccw_pin_L = 8;
 int rpm_pin_L = A1;
 int max_pwm = 253;
 
+// in PID domain
+float pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
+
+// in input domain
 float left;
 float right;
 float prev_left;
 float prev_right;
 
+// clockwise right and left
 bool cw_R;
 bool cw_L;
 
+// left and right pwm values to write to driver
 int left_pwm;
 int right_pwm;
 
+// input string to receive from Jetson
+String input_str;
  
 
 void setup() {
@@ -54,100 +69,106 @@ void setup() {
   pinMode(cw_pin_L, OUTPUT);
   pinMode(ccw_pin_L, OUTPUT);
   pinMode(rpm_pin_L, INPUT);
-
-//  //initialize the variables we're linked to
-//  pid_inputL = analogRead(rpm);
-//  pid_inputR = analogRead(0);
-//  pid_setpoint = 100;
-//
-//  //Specify the links and initial tuning parameters
-//  PID *pidR = new PID(&pid_input, &pid_output, &pid_setpoint,2,5,1, DIRECT);
-//  PID *pidL = new PID(&pid_input, &pid_output, &pid_setpoint,2,5,1, DIRECT);
-//
-//  //turn the PID on
-//  myPID.SetMode(AUTOMATIC); //turn PID on
-//  myPID.SetSampleTime(200); //in ms
   
-  Serial.begin(9600);
-}
-
-void loop() {
-  //receive direction input of form (float,float). Ex: (1.0,1.0) means forward full speed
-//  String incomingStr = "(1.0, 1.0)";
-  
-//  if (Serial.available() > 0) {
-//    // read the incoming byte:
-//    incomingStr = Serial.read();
-//  }
-//  
-//  left = incomingStr.substring(1, incomingStr.indexOf(',')).toFloat();
-//  right = incomingStr.substring(incomingStr.indexOf(',')+1, incomingStr.length()-1).toFloat();
-
-  left = 0.5;
-  right = 0.5;
-
-  // scale setpoints to analog values
-  pid_setpoint_L = left;
-  pid_setpoint_R = right;
-
-  // take in RPM input
+  // get current motor movement
   pid_input_L = analogRead(rpm_pin_L);
   pid_input_R = analogRead(rpm_pin_R);
 
-  //Specify the links and initial tuning parameters
-  PID *pidL = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
-  PID *pidR = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
+  // init setpoint as not moving
+  pid_setpoint_L = 0.0;
+  pid_setpoint_R = 0.0;
 
+  // create initial PID controllers - input, output, setpoint, tuning parameters
+  PID *pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R, 2, 5, 1, DIRECT);
+  PID *pid_L = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L, 2, 5, 1, DIRECT);
 
+  // turn PID on and set sample time in ms
+  pid_R.SetMode(AUTOMATIC);
+  pid_R.SetSampleTime(200);
+  pid_L.SetMode(AUTOMATIC);
+  pid_L.SetSampleTime(200);
 
-  // temporary
-  prev_left = left;
-  prev_right =  right;
+  // init as not moving
+  left = 0.0;
+  right = 0.0;
+  prev_left = 0.0;
+  prev_right =  0.0;
+    
+  // start serial
+  Serial.begin(9600); 
+}
 
-  if (left != prev_left){
-    delete pidL;
-    PID *pidL = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
-  }
-  if (right != prev_right){
-    delete pidR;
-    PID *pidR = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
-  }
+void loop() {
 
+  // read the incoming byte
+//  if (Serial.available() > 0) {
+//    input_str = Serial.read();
+   
+//    // parse input string
+//    left = input_str.substring(1, input_str.indexOf(',')).toFloat();
+//    right = input_str.substring(input_str.indexOf(',')+1, input_str.length()-1).toFloat();
+//  }
+  left = 0.5
+  right = 0.5
+
+  // set directions
   cw_R = (right > 0);
   cw_L = (left < 0);
+
+  // scale setpoints to PID domain
+  pid_setpoint_L = abs(left);
+  pid_setpoint_R = abs(right);
+
+  // take in RPM input from driver - analog to PID
+  pid_input_L = analog_to_PID(analogRead(rpm_pin_L));
+  pid_input_R = analog_to_PID(analogRead(rpm_pin_R));
+
+  // create new PIDs if input from Jetson has changed
+  if (left != prev_left){
+    delete pid_L;
+    PID *pid_L = new PID(&pid_input_L, &pid_output_L, &pid_setpoint_L,2,5,1, DIRECT);
+  }
+  if (right != prev_right){
+    delete pid_R;
+    PID *pid_R = new PID(&pid_input_R, &pid_output_R, &pid_setpoint_R,2,5,1, DIRECT);
+  }
   
-  left_pwm = left*max_pwm;
-  right_pwm = right*max_pwm;
+  // write pwm to drivers
+  left_pwm = PID_to_pwm(pid_output_L);
+  right_pwm = PID_to_pwm(pid_output_R);
   analogWrite(pwm_pin_L,left_pwm); //253 max
   analogWrite(pwm_pin_R,right_pwm); //253 max
+
+  // write direction pins on drivers
   digitalWrite(cw_pin_R, cw_R); //Direction --forward
   digitalWrite(cw_pin_L, cw_L); //Direction
   digitalWrite(ccw_pin_R, ~cw_R); //Direction
   digitalWrite(ccw_pin_L, ~cw_L); //Direction
-    
-  pid_input = anlgToRPM(analogRead(rpm_pin_R));
-  pidR.Compute();
-  analogWrite(3,pid_output);
 
-  pid_input = anlgToRPM(analogRead(rpm_pin_L));
-  pidL.Compute();
-  analogWrite(3,pid_output);
-
+  // save input motor speeds
   prev_left = left;
   prev_right = right;
 
-  
+  // must call compute pid every loop - will only actually run every SetSampleTime ms
+  pid_R.Compute();
+  pid_L.Compute();
 }
 
-float anlgToPID(int anlg){
-  anlg = anlg - 512; // shift to [-512, 512]
-  int dir = anlg > 0 ? 1 : 0;
-  anlg = abs(anlg); // reflect over x-axis to get positive values
-  return anlg / 512.0;
-  
-}
 
-int anlgToRpm(int anlg){ //2v = 0rpm, 4v = 8000rpm, 0v = -8000
-  anlg = anlg-512; //[-512, 512]
-  return anlg*15.625; //[-8000, 8000]
-}
+// // === Domain Conversion Functions ===
+
+// float anlgToPID(int anlg){
+//   anlg = anlg - 512; // shift to [-512, 512]
+//   int dir = anlg > 0 ? 1 : 0;
+//   anlg = abs(anlg); // reflect over x-axis to get positive values
+//   return anlg / 512.0; 
+// }
+
+// int pidToPWM(float pid_value){
+//   return int(pid_value * max_pwm);
+// }
+
+// int anlgToRpm(int anlg){ //2v = 0rpm, 4v = 8000rpm, 0v = -8000
+//   anlg = anlg-512; //[-512, 512]
+//   return anlg*15.625; //[-8000, 8000]
+// }
