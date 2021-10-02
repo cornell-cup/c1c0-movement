@@ -43,14 +43,10 @@ int max_pwm = 253;
 double pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
 
 // in input domain
-float left;
-float right;
-float prev_left;
-float prev_right;
+double left, right, prev_left, prev_right;
 
 // clockwise right and left
-bool cw_R;
-bool cw_L;
+bool cw_R, cw_L;
 
 // left and right pwm values to write to driver
 int left_pwm;
@@ -74,8 +70,8 @@ void setup() {
   pinMode(rpm_pin_L, INPUT);
   
   // get current motor movement
-  pid_input_L = analogRead(rpm_pin_L);
-  pid_input_R = analogRead(rpm_pin_R);
+  pid_input_L = analog_to_PID(analogRead(rpm_pin_L));
+  pid_input_R = analog_to_PID(analogRead(rpm_pin_R));
 
   // init setpoint as not moving
   pid_setpoint_L = 0.0;
