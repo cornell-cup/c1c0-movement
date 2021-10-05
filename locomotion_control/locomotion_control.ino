@@ -107,10 +107,12 @@ void loop() {
   // read the incoming byte
 //  if (Serial.available() > 0) {
 //    input_str = Serial.read();
-   
+//   
 //    // parse input string
-//    left = input_str.substring(1, input_str.indexOf(',')).toFloat();
-//    right = input_str.substring(input_str.indexOf(',')+1, input_str.length()-1).toFloat();
+//    if (input_str != "-1"){
+//      left = input_str.substring(1, input_str.indexOf(',')).toFloat();
+//      right = input_str.substring(input_str.indexOf(',')+1, input_str.length()-1).toFloat();
+//    }
 //  }
   left = 0.2;
   right = 0.2;
@@ -157,22 +159,3 @@ void loop() {
   pid_R->Compute();
   pid_L->Compute();
 }
-
-
-// // === Domain Conversion Functions ===
-
-// float anlgToPID(int anlg){
-//   anlg = anlg - 512; // shift to [-512, 512]
-//   int dir = anlg > 0 ? 1 : 0;
-//   anlg = abs(anlg); // reflect over x-axis to get positive values
-//   return anlg / 512.0; 
-// }
-
-// int pidToPWM(float pid_value){
-//   return int(pid_value * max_pwm);
-// }
-
-// int anlgToRpm(int anlg){ //2v = 0rpm, 4v = 8000rpm, 0v = -8000
-//   anlg = anlg-512; //[-512, 512]
-//   return anlg*15.625; //[-8000, 8000]
-// }
