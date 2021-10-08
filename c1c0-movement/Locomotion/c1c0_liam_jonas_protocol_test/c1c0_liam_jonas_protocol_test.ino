@@ -11,11 +11,13 @@ void loop() {
 
     if(Serial1.available() > 0)
     {
-      uint8_t b = Serial.read();
+      uint8_t b = Serial1.read();
       r2pf_read(&fsm, b);
     }
-    if (fsm.done)
+    if (strncmp("ON", fsm.type, 2) == 0)
     digitalWrite(13,HIGH);
-
+    if (strncmp("OFF", fsm.type, 3) == 0)
+    digitalWrite(13,LOW);
+    
 }
 //comment
