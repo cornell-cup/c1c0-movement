@@ -12,14 +12,13 @@ void loop() {
     if(Serial1.available() > 0)
     {
       uint8_t b = Serial1.read();
-      r2pf_read(&fsm, b);
-      Serial.print(b);
+      r2pf_read(&fsm, b, 200);
       if (fsm.done == 1)
       {
         Serial.print(fsm.type);
-        if (strncmp("ON", fsm.type, 2) == 0)
+        if (strncmp("2ON", fsm.type, 3) == 0)
           digitalWrite(13,HIGH);
-        if (strncmp("OFF", fsm.type, 2) == 0)
+        if (strncmp("2OFF", fsm.type, 3) == 0)
           digitalWrite(13, LOW);
           
       

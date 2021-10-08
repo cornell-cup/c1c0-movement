@@ -41,7 +41,7 @@ static const uint16_t r2p_crc16_table[256] = {
   0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
   0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 };
-uint8_t ID = 100; // 100 is placeholder
+// 100 is placeholder
 /**
  * Compute the CRC16 CCITT checksum of data.
  *
@@ -210,7 +210,7 @@ inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffe
 // FSM States
 #define R2PF_STATE_START 0
 #define R2PF_STATE_CHECKSUM 10
-#define R2PF_STATE_ADDRESS 
+#define R2PF_STATE_ADDRESS 18
 #define R2PF_STATE_TYPE 20
 #define R2PF_STATE_LENGTH 30
 #define R2PF_STATE_DATA 40
@@ -268,17 +268,17 @@ inline void r2pf_read(r2pf_t* fsm, uint8_t read, uint8_t ID) {
     case R2PF_STATE_ADDRESS:
       buffer[fsm->buffer_index] = read;
       fsm->buffer_index++;
-      if(buffer[fsm->buffer_index] == ID)
-      fsm->state = R2PF_STATE_START;
-      if (fsm->buffer_index = ID) {
+     /*if(buffer[fsm->buffer_index] != ID)
+      fsm->state = R2PF_STATE_START;*/ 
+      if (fsm->buffer_index == 9) {
         fsm->address = (buffer[5] << 8);
         fsm->state = R2PF_STATE_TYPE;
-      }
+      } 
       break;
     case R2PF_STATE_TYPE:
       buffer[fsm->buffer_index] = read;
       fsm->buffer_index++;
-      if (fsm->buffer_index == 9) {
+      if (fsm->buffer_index == 10) {
         memcpy(fsm->type, buffer + 5, 4);
         fsm->state = R2PF_STATE_LENGTH;
       }
@@ -286,8 +286,8 @@ inline void r2pf_read(r2pf_t* fsm, uint8_t read, uint8_t ID) {
     case R2PF_STATE_LENGTH:
       buffer[fsm->buffer_index] = read;
       fsm->buffer_index++;
-      if (fsm->buffer_index == 13) {
-        fsm->data_len = (buffer[9] << 24) | (buffer[10] << 16) | (buffer[11] << 8) | buffer[12];
+      if (fsm->buffer_index == 14) {
+        fsm->data_len = (buffer[10] << 24) | (buffer[11] << 16) | (buffer[12] << 8) | buffer[13];
         if (fsm->data_len > 0) {
           fsm->state = R2PF_STATE_DATA;
         }
@@ -302,8 +302,8 @@ inline void r2pf_read(r2pf_t* fsm, uint8_t read, uint8_t ID) {
         fsm->crc = (fsm->crc << 8) ^ r2p_crc16_table[((fsm->crc >> 8) ^ read) & 0xff];
       }
       fsm->buffer_index++;
-      if (fsm->buffer_index == 13 + fsm->data_len) {
-        fsm->data = buffer + 13;
+      if (fsm->buffer_index == 14 + fsm->data_len) {
+        fsm->data = buffer + 14;
         fsm->state = R2PF_STATE_END;
 
         // Avoid a crc of 0
@@ -313,12 +313,12 @@ inline void r2pf_read(r2pf_t* fsm, uint8_t read, uint8_t ID) {
       }
       break;
     case R2PF_STATE_END:
-      if ((fsm->buffer_index == fsm->data_len + 13 && read == 0xd2)
-          || (fsm->buffer_index == fsm->data_len + 14 && read == 0xe2)
-          || (fsm->buffer_index == fsm->data_len + 15 && read == 0xf2)) {
+      if ((fsm->buffer_index == fsm->data_len + 14 && read == 0xd2)
+          || (fsm->buffer_index == fsm->data_len + 15 && read == 0xe2)
+          || (fsm->buffer_index == fsm->data_len + 16 && read == 0xf2)) {
         buffer[fsm->buffer_index] = read;
         fsm->buffer_index++;
-        if (fsm->buffer_index == fsm->data_len + 16) {
+        if (fsm->buffer_index == fsm->data_len + 17) {
           // TODO Check CRC
           fsm->state = R2PF_STATE_START;
           fsm->buffer_index = 0;
