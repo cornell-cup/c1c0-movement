@@ -1,1 +1,1 @@
-include AUTHORS PACKAGES VERSION c1c0-movement/* locomotion_control/* pid_test/* arms_jetson.py
+include AUTHORS PACKAGES VERSION c1c0_movement/* locomotion_control/* pid_test/* arms_jetson.py

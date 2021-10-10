@@ -70,6 +70,7 @@ def get_version():
 
 
 def _setup(_readme):
+    print('name=', name)
     long_description = readme(_readme)
     short_description = get_short_description(long_description)
     print('short_description=', short_description)

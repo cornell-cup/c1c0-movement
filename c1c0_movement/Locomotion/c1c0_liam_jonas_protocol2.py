@@ -47,21 +47,21 @@ def crc16(data):
     return crc
 
 
-def encode(type, address, data):
+def encode(type_, address, data):
     checksum = crc16(data)
     return struct.pack("> 3B H 1s 4s I {}s 3B".format(len(data)),
-                       0xa2, 0xb2, 0xc2, checksum, address, type, len(data), data, 0xd2, 0xe2, 0xf2)
+                       0xa2, 0xb2, 0xc2, checksum, address, type_, len(data), data, 0xd2, 0xe2, 0xf2)
 
 
 def decode(data):
-    '''
+    """
     Confirm checksum and return a tuple containing message type, message data, and checksum status
     Checksum stats: 0 for incorrect checksum, 1 for correct checksum
     Argument: bytes containing a packet using R2Protocol
     Decode requires no data with length greater than 4 bytes in length be received
     R2Protocol dictates that idx 3 contains checksum, idx 4 contains type,
     idx 5 contains data length, idx 6 contains data
-    '''
+    """
 
     # try upacking data until the correct message length is found
     flag = False
@@ -75,8 +75,9 @@ def decode(data):
 
     if i >= 17:
         # error decoding
-        return (-1, -1, -1)
+        return -1, -1, -1
 
+    # FIXME: recv can be not assigned if exception gets thrown and nothing else
     msgchecksum = recv[3]
     msgtype = recv[4]
     msglength = recv[5]
@@ -84,5 +85,5 @@ def decode(data):
 
     checksum = crc16(msg)
     status = int(checksum == msgchecksum)
-    return (msgtype, msg, status)
+    return msgtype, msg, status
 
