@@ -1,0 +1,7 @@
+include AUTHORS
+include PACKAGES
+include VERSION
+include c1c0_movement/*
+include locomotion_control/*
+include pid_test/*
+include arms_jetson.py

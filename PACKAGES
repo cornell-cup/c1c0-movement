@@ -1,0 +1,6 @@
+{
+  "packages": [
+    "c1c0_movement",
+    "c1c0_movement.Locomotion"
+  ]
+}
