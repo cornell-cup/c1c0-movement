@@ -142,6 +142,7 @@ inline int32_t r2p_encode(const char type[5], const uint8_t address, const uint8
  * @param   data_len  Output length of output data array
  * @return  Number of bytes read, -1 if failed to parse
  */
+
 inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Search for the starting byte
   uint32_t index = 0;
@@ -216,7 +217,7 @@ inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffe
 #define R2PF_STATE_DATA 40
 #define R2PF_STATE_END 50
 #define R2PF_STATE_DONE 60
-
+//definition of message structure
 typedef struct {
   int16_t state;
   uint8_t* buffer;
@@ -236,7 +237,7 @@ inline r2pf_t r2pf_init(uint8_t* buffer, uint32_t buffer_len) {
   // TODO Check buffer length
   return (r2pf_t) { R2PF_STATE_START, buffer, buffer_len, 0, 0xffff };
 }
-
+// read(state machine, data being read in, Adress of specific microcontroller)
 inline void r2pf_read(r2pf_t* fsm, uint8_t read, uint8_t ID) {
   uint8_t* buffer = fsm->buffer;
   switch (fsm->state) {
