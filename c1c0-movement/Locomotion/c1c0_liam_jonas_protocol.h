@@ -269,18 +269,18 @@ inline void r2pf_read(r2pf_t* fsm, uint8_t read, uint8_t ID) {
     case R2PF_STATE_ADDRESS:
       buffer[fsm->buffer_index] = read;
       fsm->buffer_index++;
-     /*if(buffer[fsm->buffer_index] != ID)
-      fsm->state = R2PF_STATE_START;*/ 
       if (fsm->buffer_index == 9) {
-        fsm->address = (buffer[5] << 8);
+        fsm->address = buffer[5];
         fsm->state = R2PF_STATE_TYPE;
+        if (buffer[5] != ID)
+            fsm->state = R2PF_STATE_START;
       } 
       break;
     case R2PF_STATE_TYPE:
       buffer[fsm->buffer_index] = read;
       fsm->buffer_index++;
       if (fsm->buffer_index == 10) {
-        memcpy(fsm->type, buffer + 5, 4);
+        memcpy(fsm->type, buffer + 6, 4);
         fsm->state = R2PF_STATE_LENGTH;
       }
       break;

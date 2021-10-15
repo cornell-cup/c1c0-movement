@@ -8,17 +8,29 @@ void setup() {
   pinMode(13,OUTPUT);
 }
 char s = 'a';
+void printmsg(){
+  Serial.print("Address: ") ;
+  Serial.println(fsm.address);
+  Serial.print("Type : ");
+  Serial.println(fsm.type);
+  Serial.print("Length: ") ;
+  Serial.println(fsm.data_len);
+  Serial.print("Data : ");
+  Serial.println(int(fsm.data));
+  Serial.println("" );
+  
+}
 void loop() {
     if(Serial1.available() > 0)
     {
       uint8_t b = Serial1.read();
-      r2pf_read(&fsm, b, 200);
+      r2pf_read(&fsm, b, 3);
       if (fsm.done == 1)
       {
-        Serial.print(fsm.type);
-        if (strncmp("2ON", fsm.type, 3) == 0)
+        printmsg();
+        if (strncmp("ON", fsm.type, 3) == 0)
           digitalWrite(13,HIGH);
-        if (strncmp("2OFF", fsm.type, 3) == 0)
+        if (strncmp("DOE", fsm.type, 3) == 0)
           digitalWrite(13, LOW);
           
       
