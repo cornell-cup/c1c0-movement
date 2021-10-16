@@ -71,7 +71,7 @@ inline uint16_t r2p_crc16(const uint8_t* data, uint32_t len) {
  * @param   buffer_len  Length of preallocated buffer
  * @return  Number of bytes written, -1 if failed
  */
-inline int32_t r2p_encode_nocs(const char type[5],const uint8_t address, const uint8_t* data, uint32_t data_len, uint8_t* buffer, uint32_t buffer_len) {
+inline int32_t r2p_encode_nocs(const char type[5], uint8_t address, const uint8_t* data, uint32_t data_len, uint8_t* buffer, uint32_t buffer_len) {
   // Make sure the buffer is large enough
   if (buffer_len < data_len + R2P_HEADER_SIZE) {
     return -1;
@@ -118,7 +118,7 @@ inline int32_t r2p_encode_nocs(const char type[5],const uint8_t address, const u
  * @return  Number of bytes written, -1 if failed
  */
 
-inline int32_t r2p_encode(const char type[5], const uint8_t address, const uint8_t* data, uint32_t data_len, uint8_t* buffer, uint32_t buffer_len) {
+inline int32_t r2p_encode(const char type[5],uint8_t address, const uint8_t* data, uint32_t data_len, uint8_t* buffer, uint32_t buffer_len) {
   // Encode without the checksum first
   uint32_t n = r2p_encode_nocs(type, address, data, data_len, buffer, buffer_len);
   if (n < 0) {
