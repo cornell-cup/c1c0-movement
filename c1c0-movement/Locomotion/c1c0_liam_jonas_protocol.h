@@ -41,7 +41,6 @@ static const uint16_t r2p_crc16_table[256] = {
   0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
   0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 };
-// 100 is placeholder
 /**
  * Compute the CRC16 CCITT checksum of data.
  *
@@ -118,6 +117,7 @@ inline int32_t r2p_encode_nocs(const char type[5],const uint8_t address, const u
  * @param   buffer_len  Length of preallocated buffer
  * @return  Number of bytes written, -1 if failed
  */
+
 inline int32_t r2p_encode(const char type[5], const uint8_t address, const uint8_t* data, uint32_t data_len, uint8_t* buffer, uint32_t buffer_len) {
   // Encode without the checksum first
   uint32_t n = r2p_encode_nocs(type, address, data, data_len, buffer, buffer_len);
@@ -142,6 +142,8 @@ inline int32_t r2p_encode(const char type[5], const uint8_t address, const uint8
  * @param   data_len  Output length of output data array
  * @return  Number of bytes read, -1 if failed to parse
  */
+
+/*
 
 inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Search for the starting byte
@@ -176,7 +178,6 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t address, uint32_t 
   }
   return -1;
 }
-
 /**
  * Decode data into preallocated buffers.
  *
@@ -187,7 +188,7 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t address, uint32_t 
  * @param   data  Output unsigned 8 bit array of data
  * @param   data_len  Output length of output data array
  * @return  Number of bytes read, -1 if failed to parse, -2 if failed checksum
- */
+ 
 inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Decode without checking the checksum first
   uint32_t n = r2p_decode_nocs(buffer, address, buffer_len, checksum, type, data, data_len);
@@ -207,6 +208,8 @@ inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffe
   }
   return -2;
 }
+
+*/
 
 // FSM States
 #define R2PF_STATE_START 0
