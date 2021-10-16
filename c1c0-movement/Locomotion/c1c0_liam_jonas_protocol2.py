@@ -53,7 +53,7 @@ def encode(type, address, data):
                        0xa2, 0xb2, 0xc2, checksum, address, type, len(data), data, 0xd2, 0xe2, 0xf2)
 
 
-def decode(data):
+def decode(data,ID):
     '''
     Confirm checksum and return a tuple containing message type, message data, and checksum status
     Checksum stats: 0 for incorrect checksum, 1 for correct checksum
@@ -76,12 +76,15 @@ def decode(data):
     if i >= 17:
         # error decoding
         return (-1, -1, -1)
-
     msgchecksum = recv[3]
-    msgtype = recv[4]
-    msglength = recv[5]
-    msg = recv[6]
-
+    address = int.from_bytes(recv[4],'big')
+    msgtype = recv[5]
+    msglength = recv[6]
+    msg = recv[7]
+    if address != ID:
+        # error decoding
+        return (-1, -1, 1)
+	    
     checksum = crc16(msg)
     status = int(checksum == msgchecksum)
     return (msgtype, msg, status)
