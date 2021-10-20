@@ -7,7 +7,7 @@
   
  */
 #include <PID_v1.h> //https://playground.arduino.cc/Code/PIDLibrary/
-//#include "R2Protocol.h"
+#include "R2Protocol.h"
 
 /* Define our domains:
  *  Analog domain: [0, 1024] where [0, 512] indicates backwards and [512, 1024] is forwards. 512 means the motor should not be moving
@@ -28,6 +28,15 @@
 #define analog_to_PID(anlg) abs(((anlg/512) - 1)) 
 #define PID_to_pwm(PID) (PID*max_pwm)
 
+// r2protocol declarations;
+uint8_t recv_buffer[21];
+uint8_t type[5];
+uint16_t checksum;
+uint8_t data[21];
+int32_t x = 1000;
+int i = 0;
+uint32_t data_len = 5;
+
 // pin defintions
 int pwm_pin_R = 11;
 int pwm_pin_L = 3;
@@ -43,7 +52,7 @@ int max_pwm = 253;
 double pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
 
 // in input domain
-double left, right, prev_left, prev_right;
+float left, right, prev_left, prev_right;
 
 // clockwise right and left
 bool cw_R, cw_L;
@@ -102,18 +111,30 @@ void setup() {
   Serial.begin(9600); 
 }
 
+uint8_t num [5];
+
 void loop() {
 
   // read the incoming byte
-//  if (Serial.available() > 0) {
-//    input_str = Serial.read();
-//   
-//    // parse input string
-//    if (input_str != "-1"){
-//      left = input_str.substring(1, input_str.indexOf(',')).toFloat();
-//      right = input_str.substring(input_str.indexOf(',')+1, input_str.length()-1).toFloat();
-//    }
-//  }
+ if (Serial.available() > 0) {
+    Serial.readBytes(recv_buffer, 21);
+     x = r2p_decode(recv_buffer, 21, &checksum, type, data, &data_len);
+      //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '' , '0' , '.' , '8' , '0' , ')'}
+     num[0] = data[1];
+     num[1] = data[2];
+     num[2] = data[3];
+     num[3] = data[4];
+     num[4] = data[5];
+     left = atof(num);
+
+     num[0] = data[7];
+     num[1] = data[8];
+     num[2] = data[9];
+     num[3] = data[10];
+     num[4] = data[11];
+     right = atof(num);
+ }
+ 
   left = 0.2;
   right = 0.2;
 
