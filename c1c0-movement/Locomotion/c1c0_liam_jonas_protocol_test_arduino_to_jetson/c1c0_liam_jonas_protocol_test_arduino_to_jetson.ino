@@ -15,6 +15,9 @@ char s = 'a';
 void loop() {
    send("ON", 8, reinterpret_cast<const uint8_t*>("STUFF"), 8);
    delay(2000);
+   send("ON", 10, reinterpret_cast<const uint8_t*>("STUFF"), 8);
+   delay(2000);
+   
 }
 
   // put your main code here, to run repeatedly:

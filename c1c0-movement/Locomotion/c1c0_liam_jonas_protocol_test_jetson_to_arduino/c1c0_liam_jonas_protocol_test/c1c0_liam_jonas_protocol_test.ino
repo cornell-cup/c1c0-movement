@@ -24,16 +24,16 @@ void loop() {
     if(Serial1.available() > 0)
     {
       uint8_t b = Serial1.read();
-      r2pf_read(&fsm, b, 3);
+      r2pf_read(&fsm, b, 8);
       if (fsm.done == 1)
       {
         printmsg();
-        if (strncmp("ON", fsm.type, 3) == 0)
-          digitalWrite(13,HIGH);
-        if (strncmp("DOE", fsm.type, 3) == 0)
-          digitalWrite(13, LOW);
-          
-      
+        if (strncmp("ON", fsm.type, 3) == 0){
+          digitalWrite(10,HIGH);
+          delay(1000);
+          digitalWrite(10,LOW);
+          delay(1000);
+        }
       fsm.done = 0;
       }
    }
