@@ -1,4 +1,4 @@
-#include "Protocol.h"
+#include "C:\Users\Liam Kain\Documents\Project Team\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
 uint8_t fsm_buffer[256];
 r2pf_t fsm;
 void setup() {
@@ -28,12 +28,12 @@ void loop() {
       if (fsm.done == 1)
       {
         printmsg();
-        if (strncmp("ON", fsm.type, 3) == 0){
+        
           digitalWrite(10,HIGH);
           delay(1000);
           digitalWrite(10,LOW);
           delay(1000);
-        }
+        
       fsm.done = 0;
       }
    }
