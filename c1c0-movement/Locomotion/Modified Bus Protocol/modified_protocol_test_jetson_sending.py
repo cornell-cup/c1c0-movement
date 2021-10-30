@@ -8,14 +8,12 @@ ser = serial.Serial(
     baudrate = 9600,
 )
 address = 4;
-type1 = "ON"
-data = "ON"
-while(1):
-    for i in range(6):
-        
-        print("ON")
-        msg = r2p.encode(b"ON",address.to_bytes(1,'big'),b"\x00a\x00a")
-        print(msg)
-        ser.write(msg)
-        time.sleep(3)
+type1 = b"ON"
+data = b"\x00a\x00a"
+while(1):    
+    print("ON")
+    msg = r2p.encode(b"ON",address.to_bytes(1,'big'),b"\x00a\x00a")
+    print(msg)
+    ser.write(msg)
+    time.sleep(3)
         

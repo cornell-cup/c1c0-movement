@@ -117,7 +117,7 @@ inline int32_t r2p_encode_nocs(const char type[5], uint8_t address, const uint8_
  * @param   buffer_len  Length of preallocated buffer
  * @return  Number of bytes written, -1 if failed
  */
-
+//sample call:encode("{type}", 8, reinterpret_cast<const uint8_t*>("{data}"), {data length()},send_buffer[{datalen}],bufferlength)
 inline int32_t r2p_encode(const char type[5],uint8_t address, const uint8_t* data, uint32_t data_len, uint8_t* buffer, uint32_t buffer_len) {
   // Encode without the checksum first
   uint32_t n = r2p_encode_nocs(type, address, data, data_len, buffer, buffer_len);
@@ -143,9 +143,7 @@ inline int32_t r2p_encode(const char type[5],uint8_t address, const uint8_t* dat
  * @return  Number of bytes read, -1 if failed to parse
  */
 
-/*
-
-inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
+inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Search for the starting byte
   uint32_t index = 0;
   while (index < buffer_len - 2 && !(buffer[index] == 0xa2 &&
@@ -158,11 +156,13 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t address, uint32_t 
   if (buffer_len - index < R2P_HEADER_SIZE) {
     return -1;
   }
-
+  // Save address and check if address is equal to ID
+  uint8_t address = buffer[index + 5];
+  if(address != ID)
+    return -1;
   // Checksum
   *checksum = (buffer[index + 3] << 8) | buffer[index + 4];
-  // Address
-  address = buffer[index + 5];
+
   // Type
   memcpy(type, buffer + 6, 4);
 
@@ -188,7 +188,7 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t address, uint32_t 
  * @param   data  Output unsigned 8 bit array of data
  * @param   data_len  Output length of output data array
  * @return  Number of bytes read, -1 if failed to parse, -2 if failed checksum
- 
+ */
 inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Decode without checking the checksum first
   uint32_t n = r2p_decode_nocs(buffer, address, buffer_len, checksum, type, data, data_len);
@@ -209,7 +209,7 @@ inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffe
   return -2;
 }
 
-*/
+
 
 // FSM States
 #define R2PF_STATE_START 0

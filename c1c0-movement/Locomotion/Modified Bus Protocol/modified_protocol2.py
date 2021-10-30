@@ -46,12 +46,21 @@ def crc16(data):
 
     return crc
 
+##TODO define address for each microcontroller
 
 def encode(type, address, data):
+    '''
+    type: 4character byte literal
+    address:integer < 10
+    data: any size byte array < 4 Bytes. Can use byte literal
+
+    sample call:
+        encode(b"{string}", {address}.tobytes(1,'big',b"{data}"))
+    '''
     checksum = crc16(data)
     return struct.pack("> 3B H 1s 4s I {}s 3B".format(len(data)),
                        0xa2, 0xb2, 0xc2, checksum, address, type, len(data), data, 0xd2, 0xe2, 0xf2)
-
+ 
 
 def decode(data,ID):
     '''
@@ -62,7 +71,6 @@ def decode(data,ID):
     R2Protocol dictates that idx 3 contains checksum, idx 4 contains type,
     idx 5 contains data length, idx 6 contains data
     '''
-
     # try upacking data until the correct message length is found
     flag = False
     i = 0

@@ -1,4 +1,4 @@
-
+ID = 4
 import serial
 import time 
 #import R2Protocol2 as r2p
@@ -9,6 +9,6 @@ ser = serial.Serial(
 )
 while(1):
     x = ser.read_until(expected = b'\xd2\xe2\xf2')
-    s = r2p.decode(x,10)
+    s = r2p.decode(x,ID)
     print(s)
 
