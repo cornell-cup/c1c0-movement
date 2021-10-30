@@ -1,5 +1,5 @@
 #include "R2Protocol.h"
-char mystr[5] = {'A', 'B', 'C', 'D', 'E'};
+char mystr[13] = {'(' , '-' , '0' , '.' , '7' , '0' , ',' , ' ' , '0' , '.' , '8' , '0' , ')'};
 char list[] = "loco";
 
 void setup() {
@@ -16,10 +16,14 @@ void send(const uint8_t* data, uint32_t data_len) {
     Serial1.write(send_buffer[i]);
   }
 }
-
+int counter = 0;
 void loop() {
-  send(mystr, 5);
-
+  send(mystr, 13);
+  if  (counter > 10){
+    Serial.println("Changing string");
+    mystr[4] = '5';  
+  }
   //Serial.write(mystr,5); //Write the serial data
   delay(1000);
+  counter++;
 }
