@@ -10,7 +10,10 @@
 #include "R2Protocol.h"
 
 /* Define our domains:
- *  Analog domain: [0, 1024] where [0, 512] indicates backwards and [512, 1024] is forwards. 512 means the motor should not be moving
+ *  Analog domain: [0, 818] where [0, 408] indicates backwards and [410, 819] is forwards. 409 means the motor should not be moving. 
+ *    This is a limitation of the driver software. The analog output only goes up to 4V. This means when it outputs 4V it is saying the motor speed is the max 
+ *    rpm (8000rpm). When it outputs 2V, the motor is not moving. When it outputs 0V, the motor is moving -8000rpm. Thus, when we read 4V on the analog input pin, 
+ *    it shows up as 1023*(4/5) because reading 5V on an analog pin returns 1023.
  *  PID domain: [0.0, 1.0] which is the magnitude of the motor speed. 1.0 is the max speed. 0.0 is no speed.
  *  Input from path planning domain: [-1.0, 1.0] where a -1.0 indicates full speed backwards and 1.0 indicates full speed forwards. 0.0 is no movement
  *  PWM domain: [0, maxpwm] which is sent to the driver to indicate how fast we want motor to move. 255 is max speed
@@ -25,7 +28,7 @@
 */
 
 // domain change functions
-#define analog_to_PID(anlg) abs(((anlg/512) - 1)) 
+#define analog_to_PID(anlg) abs(((anlg/410) - 1)) 
 #define PID_to_pwm(PID) (PID*max_pwm)
 
 // r2protocol declarations;
