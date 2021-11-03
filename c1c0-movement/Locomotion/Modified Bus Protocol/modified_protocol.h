@@ -117,6 +117,7 @@ inline int32_t r2p_encode_nocs(const char type[5], uint8_t address, const uint8_
  * @param   buffer_len  Length of preallocated buffer
  * @return  Number of bytes written, -1 if failed
  */
+
 //sample call:encode("{type}", 8, reinterpret_cast<const uint8_t*>("{data}"), {data length()},send_buffer[{datalen}],bufferlength)
 inline int32_t r2p_encode(const char type[5],uint8_t address, const uint8_t* data, uint32_t data_len, uint8_t* buffer, uint32_t buffer_len) {
   // Encode without the checksum first
@@ -189,6 +190,7 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffe
  * @param   data_len  Output length of output data array
  * @return  Number of bytes read, -1 if failed to parse, -2 if failed checksum
  */
+
 inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Decode without checking the checksum first
   uint32_t n = r2p_decode_nocs(buffer, address, buffer_len, checksum, type, data, data_len);
