@@ -122,7 +122,7 @@ void loop() {
  if (Serial.available() > 0) {
     Serial.readBytes(recv_buffer, 21);
      x = r2p_decode(recv_buffer, 21, &checksum, type, data, &data_len);
-      //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '' , '0' , '.' , '8' , '0' , ')'}
+      //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'}
      num[0] = data[1];
      num[1] = data[2];
      num[2] = data[3];
