@@ -49,7 +49,7 @@ int rpm_pin_R = A0;
 int cw_pin_L = 8;
 int ccw_pin_L = 7;
 int rpm_pin_L = A1;
-int max_pwm = 253;
+int max_pwm = 253; // 255 caused the motor drivers to stall, so we set max as 253
 
 // in PID domain
 double pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
