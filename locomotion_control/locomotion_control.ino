@@ -138,7 +138,7 @@ void loop() {
      right = atof(num);
  }
  
-  left = 0.2;
+  left = 0.2; // comment these out once we are receiving left and right values from the Jetson
   right = 0.2;
 
   // set directions
