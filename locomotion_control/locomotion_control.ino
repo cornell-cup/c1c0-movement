@@ -55,7 +55,7 @@ int max_pwm = 253;
 double pid_setpoint_L, pid_setpoint_R, pid_input_L, pid_input_R, pid_output_L, pid_output_R;
 
 // in input domain
-float left, right, prev_left, prev_right;
+float left, right;
 
 // clockwise right and left
 bool cw_R, cw_L;
@@ -152,19 +152,10 @@ void loop() {
   // take in RPM input from driver - analog to PID
   pid_input_L = analog_to_PID(analogRead(rpm_pin_L));
   pid_input_R = analog_to_PID(analogRead(rpm_pin_R));
-//  pid_input_L = 0.2;
-//  pid_input_R = 0.2;
   
   // write pwm to drivers
   left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
   right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
-
-  
-//  Serial.println(pid_input_L);
-//  Serial.println(pid_output_L);
-//  Serial.println("Left PWM: " + left_pwm);
-//  Serial.println("Right PWM: " + right_pwm);
-
 
   analogWrite(pwm_pin_L,left_pwm); //253 max
   analogWrite(pwm_pin_R,right_pwm); //253 max
@@ -174,10 +165,6 @@ void loop() {
   digitalWrite(cw_pin_L, cw_L); //Direction
   digitalWrite(ccw_pin_R, ~cw_R); //Direction
   digitalWrite(ccw_pin_L, ~cw_L); //Direction
-
-  // save input motor speeds
-  prev_left = left;
-  prev_right = right;
 
   // must call compute pid every loop - will only actually run every SetSampleTime ms
   pid_R->Compute();
