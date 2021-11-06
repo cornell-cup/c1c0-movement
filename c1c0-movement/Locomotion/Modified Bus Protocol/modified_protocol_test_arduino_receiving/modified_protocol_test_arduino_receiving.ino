@@ -16,7 +16,10 @@ void printmsg(){
   Serial.print("Length: ") ;
   Serial.println(fsm.data_len);
   Serial.print("Data : ");
-  Serial.println(int(fsm.data));
+  for(int i = 0; i < fsm.data_len; i ++){
+  Serial.println(i);
+  Serial.println(fsm.data[i]);
+  }
   Serial.println("" );
   
 }
@@ -24,7 +27,7 @@ void loop() {
     if(Serial1.available() > 0)
     {
       uint8_t b = Serial1.read();
-      r2pf_read(&fsm, b, 8);
+      r2pf_read(&fsm, b, 4);
       if (fsm.done == 1)
       {
         printmsg();

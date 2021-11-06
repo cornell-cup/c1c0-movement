@@ -9,7 +9,7 @@ ser = serial.Serial(
 )
 address = 4;
 type1 = b"ON"
-data = b"\x10a\x00a"
+data = b"\x0a\x0a"
 while(1):    
     print("ON")
     msg = r2p.encode(b"ON",address.to_bytes(1,'big'),data)

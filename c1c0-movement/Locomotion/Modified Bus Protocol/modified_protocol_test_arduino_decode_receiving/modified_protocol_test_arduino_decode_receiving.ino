@@ -1,7 +1,15 @@
 #include "C:\Users\Liam Kain\Documents\Project Team\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
-uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type, uint8_t* data, uint32_t* data_len
+uint16_t checksum;
+uint8_t address = 4; 
+uint8_t recv_buffer[20];
+uint32_t buffer_len = 20; 
+//uint16_t* checkptr = & checksum; 
+char type[5]; 
+uint8_t data[3]; 
+uint32_t data_len = 3;
+
 void setup() {
-  fsm = r2pf_init(fsm_buffer, 256);
+  
   Serial.begin(9600);
   Serial1.begin(9600);
   pinMode(13,OUTPUT);
@@ -15,15 +23,17 @@ void printmsg(){
   Serial.print("Length: ") ;
   Serial.println(data_len);
   Serial.print("Data : ");
-  Serial.println(int(data));
+  for(int i=0; i<data_len; i++){
+    Serial.println(data[i]);
+    }
   Serial.println("" );
   
 }
 void loop() {
     if(Serial1.available() > 0)
     {
-      uint8_t b = Serial1.read();
-      r2p_decode(b,address,buffer_len,checksum,type, data,data_len );
+      Serial1.readBytes(recv_buffer,19);
+      r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len );
 
         printmsg();
         
@@ -32,6 +42,6 @@ void loop() {
           digitalWrite(10,LOW);
           delay(1000);
         
-      fsm.done = 0;
+
       }
    }
