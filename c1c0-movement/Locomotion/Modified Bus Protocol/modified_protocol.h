@@ -4,8 +4,10 @@
 #include <stdint.h>
 #include <string.h>
 
-
-#define R2P_HEADER_SIZE 17
+/** This is the size of the encoded buffer without the data field
+ * when typing in the buffer length for the decode function, the buffer length is this field + data_len
+*/
+#define R2P_HEADER_SIZE 17 
 
 static const uint16_t r2p_crc16_table[256] = {
   0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,

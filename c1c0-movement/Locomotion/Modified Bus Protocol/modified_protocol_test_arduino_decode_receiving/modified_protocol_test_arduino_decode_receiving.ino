@@ -1,15 +1,21 @@
 #include "C:\Users\Liam Kain\Documents\Project Team\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
-uint16_t checksum;
-uint8_t address = 4; 
-uint8_t recv_buffer[20];
-uint32_t buffer_len = 20; 
-//uint16_t* checkptr = & checksum; 
-char type[5]; 
-uint8_t data[3]; 
-uint32_t data_len = 3;
+/*
+
+
+Dark: address = 8
+Lite: address = 4
+*/
+const uint8_t dataLength = 2; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
+uint16_t checksum; //integer for checksum to be inserted into
+uint8_t address = 8; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
+uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
+uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
+char type[5]; //character array which the type literal will be inserted into
+uint8_t data[2]; //the array which data will be inserted into
+uint32_t data_len; // integer for length of data to be inserted into
+uint8_t datalast;
 
 void setup() {
-  
   Serial.begin(9600);
   Serial1.begin(9600);
   pinMode(13,OUTPUT);
@@ -22,26 +28,22 @@ void printmsg(){
   Serial.println(type);
   Serial.print("Length: ") ;
   Serial.println(data_len);
-  Serial.print("Data : ");
+  Serial.println("Data : ");
   for(int i=0; i<data_len; i++){
-    Serial.println(data[i]);
+    Serial.print(data[i]);
+    Serial.print("  ");
     }
-  Serial.println("" );
+  Serial.println(" ");
   
 }
 void loop() {
-    if(Serial1.available() > 0)
+    if(Serial1.available() > 0) //checks if there is data in the serial buffer to be read
     {
-      Serial1.readBytes(recv_buffer,19);
-      r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len );
-
+      datalast = data[0];
+      Serial1.readBytes(recv_buffer,R2P_HEADER_SIZE + dataLength); // reads the buffer data storing a buffer_len length of data in in recv_buffer
+      r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len ); // decoding received data
+      if(datalast != data[0])
         printmsg();
-        
-          digitalWrite(10,HIGH);
-          delay(1000);
-          digitalWrite(10,LOW);
-          delay(1000);
-        
-
+      
       }
    }
