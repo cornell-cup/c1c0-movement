@@ -1,5 +1,6 @@
 import serial
 import sys
+import time
 
 sys.path.insert(0, './c1c0-movement/Locomotion/')
 import R2Protocol2
@@ -31,4 +32,9 @@ def writeToSerial(writeArray):
 	ser.write(write_byte)
 	
 # For Debugging Purposes 	
-writeToSerial([10,20,30,40,50,60])
+writeToSerial([10,100,30,40,50,60])
+print("first send: ", 100)
+time.sleep(5)
+writeToSerial([10, 150,30,40,50,60])
+print("second send:", 150)
+
