@@ -31,7 +31,6 @@ void loop() {
       if (fsm.done == 1)
       {
         printmsg();
-        
           digitalWrite(10,HIGH);
           delay(1000);
           digitalWrite(10,LOW);
