@@ -32,9 +32,17 @@ def writeToSerial(writeArray):
 	ser.write(write_byte)
 	
 # For Debugging Purposes 	
-writeToSerial([10,100,30,40,50,60])
-print("first send: ", 100)
+# arm should move from start position to 60 to 100 to 20 then stop
+array1 = [10,60,30,40,50,60]
+array2 = [10,100,30,40,50,60]
+array3 = [10,20,30,40,50,60]
+
+writeToSerial(array1)
+print("first send: ", array1[1])
 time.sleep(5)
-writeToSerial([10, 150,30,40,50,60])
-print("second send:", 150)
+writeToSerial(array2)
+print("second send:", array2[1])
+time.sleep(5)
+writeToSerial(array3)
+print("third send: ", array3[1])
 
