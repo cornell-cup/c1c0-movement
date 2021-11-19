@@ -32,13 +32,13 @@
 #define PID_to_pwm(PID) (PID*max_pwm)
 
 // r2protocol declarations;
-uint8_t recv_buffer[21];
+uint8_t recv_buffer[29];
 uint8_t type[5];
 uint16_t checksum;
-uint8_t data[21];
+uint8_t data[29];
 int32_t x = 1000;
 int i = 0;
-uint32_t data_len = 5;
+uint32_t data_len = 13;
 
 // pin defintions
 int pwm_pin_R = 11;
@@ -107,11 +107,12 @@ void setup() {
   // init as not moving
   left = 0.0;
   right = 0.0;
-  prev_left = 0.0;
-  prev_right =  0.0;
+//  prev_left = 0.0;
+//  prev_right =  0.0;
     
   // start serial
   Serial.begin(9600); 
+  Serial2.begin(9600); 
 }
 
 uint8_t num [5];
@@ -119,9 +120,9 @@ uint8_t num [5];
 void loop() {
 
   // read the incoming byte
- if (Serial.available() > 0) {
-    Serial.readBytes(recv_buffer, 21);
-     x = r2p_decode(recv_buffer, 21, &checksum, type, data, &data_len);
+ if (Serial2.available() > 0) {
+    Serial2.readBytes(recv_buffer, 29);
+     x = r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len);
       //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'}
      num[0] = data[1];
      num[1] = data[2];
@@ -136,10 +137,21 @@ void loop() {
      num[3] = data[10];
      num[4] = data[11];
      right = atof(num);
+     for (int i=0; i<29; i++){
+      Serial.println(recv_buffer[i]);
+      }
+      Serial.println("");
+     for (int i=0; i<13; i++){
+      Serial.println(data[i]);
+      }
  }
  
-  left = 0.2; // comment these out once we are receiving left and right values from the Jetson
-  right = 0.2;
+//  left = 0.2; // comment these out once we are receiving left and right values from the Jetson
+//  right = 0.2;
+//  Serial.print("Right: ");
+//  Serial.println(right);
+//  Serial.print("Left: ");
+//  Serial.println(left);
 
   // set directions
   cw_R = (right > 0);
