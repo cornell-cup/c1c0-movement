@@ -64,7 +64,7 @@ def decode(data):
   # try upacking data until the correct message length is found
   flag = False
   i = 0
-  while not flag and i < 2049: # allow message length up to 16 bytes
+  while not flag and i < 2049: # allow message length up to 2048 bytes
     try:
         recv = struct.unpack('> 3B H 4s I {}s 3B'.format(i), data)
         flag = True
