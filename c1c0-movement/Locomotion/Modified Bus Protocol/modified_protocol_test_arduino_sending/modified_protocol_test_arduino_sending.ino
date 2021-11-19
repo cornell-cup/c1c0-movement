@@ -1,4 +1,5 @@
 #include "C:\Users\Liam Kain\Documents\Project Team\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
+int ID = 9;
 uint8_t send_buffer[256];
 void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
   Serial.println(int(address));
@@ -10,14 +11,15 @@ void setup() {
   Serial1.begin(9600);
   pinMode(13,OUTPUT);
 }
-
+uint8_t data[] = {0x00d,0x00b,0x00c};
+uint8_t data2[] = {0x00c,0x00b,0x00d};
 char s = 'a';
 void loop() {
     //sending byte array "STUFF" to address 8  
-   send("ON", 8, reinterpret_cast<const uint8_t*>("DUE"), 8);
+   send("ON", ID, data, 8);
    delay(2000);
    //sending byte array "STUFF" to address 10
-   send("ON", 10, reinterpret_cast<const uint8_t*>("Jetson"), 8);
+   send("ON", ID, data2, 8);
    delay(2000);
    
 }
