@@ -35,7 +35,7 @@
 uint8_t recv_buffer[29];
 uint8_t type[5];
 uint16_t checksum;
-uint8_t data[29];
+char data[29];
 int32_t x = 1000;
 int i = 0;
 uint32_t data_len = 13;
@@ -111,8 +111,8 @@ void setup() {
 //  prev_right =  0.0;
     
   // start serial
-  Serial.begin(9600); 
-  Serial2.begin(9600); 
+  Serial.begin(115200); 
+  Serial2.begin(115200); 
 }
 
 uint8_t num [5];
@@ -129,14 +129,18 @@ void loop() {
      num[2] = data[3];
      num[3] = data[4];
      num[4] = data[5];
-     left = atof(num);
+     float temp_left = atof(num);
+     if(abs(temp_left) <= 1) left = temp_left;
 
      num[0] = data[7];
      num[1] = data[8];
      num[2] = data[9];
      num[3] = data[10];
      num[4] = data[11];
-     right = atof(num);
+     float temp_right = atof(num);
+     if(abs(temp_right) <= 1) right = temp_right;
+     
+     Serial.println("Start Transaction");
      for (int i=0; i<29; i++){
       Serial.println(recv_buffer[i]);
       }
@@ -153,6 +157,10 @@ void loop() {
 //  Serial.print("Left: ");
 //  Serial.println(left);
 
+  Serial.print("Right: ");
+  Serial.println(right);
+  Serial.print("Left: ");
+  Serial.println(left);
   // set directions
   cw_R = (right > 0);
   cw_L = (left < 0);
