@@ -20,6 +20,7 @@ void setup() {
   Serial1.begin(9600);
   pinMode(13,OUTPUT);
 }
+uint16_t t;
 char s = 'a';
 void printmsg(){
   Serial.print("Address: ") ;
@@ -41,9 +42,8 @@ void loop() {
     {
       datalast = data[0];
       Serial1.readBytes(recv_buffer,R2P_HEADER_SIZE + dataLength); // reads the buffer data storing a buffer_len length of data in in recv_buffer
-      r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len ); // decoding received data
-      if(datalast != data[0])
-        printmsg();
+      r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len,&t   ); // decoding received data
+      printmsg();
       if(data[0] == 11)
       digitalWrite(13,HIGH);
       else

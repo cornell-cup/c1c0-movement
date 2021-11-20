@@ -27,7 +27,7 @@ void loop() {
     if(Serial1.available() > 0)
     {
       uint8_t b = Serial1.read();
-      r2pf_read(&fsm, b, 5);
+      r2pf_read(&fsm, b, 4);
       if (fsm.done == 1)
       {
         printmsg();

@@ -17,7 +17,7 @@ uint8_t datalast;
 uint16_t isRequest;
 uint8_t send_buffer[256];
 void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
-  Serial.println(int(address));
+  Serial.println("sending stuff");
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
   Serial1.write(send_buffer, written);
 }
@@ -49,14 +49,14 @@ void loop() {
     {
       Serial1.readBytes(recv_buffer,R2P_HEADER_SIZE + dataLength); // reads the buffer data storing a buffer_len length of data in in recv_buffer
       r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len, &isRequest ); // decoding received data
-      Serial.println(isRequest);
+      printmsg();
+      }
       Serial.println(type);
       if(strncmp(type,"rqst",4)==0){
-    //sending byte array "STUFF" to address 8  
-      Serial.println("sending");
-      send("ON", address, data2, 8);
-      delay(1000);
+        Serial.println("sending");
+        send("ON", address, senddata, 8);
+        memcpy(type,"llll", 4);
       }
+      delay(1000);
       
    }
-}
