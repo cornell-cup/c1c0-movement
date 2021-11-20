@@ -1,6 +1,6 @@
 import serial
 import sys
-import time
+import codecs
 
 '''
 Arduino to Jetson Communication with R2 Protocol
@@ -26,23 +26,29 @@ def close_serial():
 	global ser
 	ser.close()
 	
+def read_encoder_values():
+	'''
+	Returns 6 encoder values i(n decimal) as an array.
+	'''
+	
 	
 if __name__ =='__main__':
 	init_serial('/dev/ttyTHS1', 9600)
 	
-	#how can I get this to print the hex value and not the ASCII
+	# initialize the array 
+	encoderAngle = [0,0,0,0,0,0]
 	try:
-            while True:
-                start = time.time()
-                ser_msg = ser.read(22) # length of message plus 16
-                for i in range(0, len(ser_msg), 32):
-                    r2p.decode(ser_msg[i:i+32])
-                    #print(ser_msg[i:i+32])
-                    print(ser_msg[i:i+32])
-                    file1.write(str(ser_msg[i:i+32]))
+		while True:
+			ser_msg = ser.read(22) # length of message plus 16
+			for i in range(0, len(ser_msg), 32):
+				msgtype, msg, status = r2p.decode(ser_msg[i:i+32])
+			    # print(msg.hex())
+				
+				for i in range(6):
+					encoderAngle[i] = int(msg[i:i+1].hex(), 16)
+					
+				print(encoderAngle)
 			
-               
-	
 	except KeyboardInterrupt:
             ser.close()
 			
