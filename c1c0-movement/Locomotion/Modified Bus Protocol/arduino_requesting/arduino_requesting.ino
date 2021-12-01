@@ -51,12 +51,15 @@ void loop() {
       r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len, &isRequest ); // decoding received data
       printmsg();
       }
-      Serial.println(type);
       if(strncmp(type,"rqst",4)==0){
-        Serial.println("sending");
-        send("ON", address, senddata, 8);
+        if(data[0] == 8)
+          send("OFF", address, senddata, 8);
+        else if(data[0] == 9)
+          send("ON", address, senddata, 8);
         memcpy(type,"llll", 4);
       }
-      delay(1000);
+      
+
+      delay(100);
       
    }
