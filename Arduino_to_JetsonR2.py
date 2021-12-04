@@ -29,26 +29,37 @@ def close_serial():
 def read_encoder_values():
 	'''
 	Returns 6 encoder values i(n decimal) as an array.
+	If the value is 1452, then the encoder is not powered or there is 
+	a wiring issue. 
 	'''
-	
-	
-if __name__ =='__main__':
-	init_serial('/dev/ttyTHS1', 9600)
-	
 	# initialize the array 
 	encoderAngle = [0,0,0,0,0,0]
 	try:
 		while True:
-			ser_msg = ser.read(22) # length of message plus 16
-			for i in range(0, len(ser_msg), 32):
-				msgtype, msg, status = r2p.decode(ser_msg[i:i+32])
-			    # print(msg.hex())
-				
-				for i in range(6):
-					encoderAngle[i] = int(msg[i:i+1].hex(), 16)
-					
-				print(encoderAngle)
-			
+			 # length of message plus 16
+			good_data = False
+			while (not good_data):
+				ser_msg = ser.read(28)
+				msgtype, msg, status = r2p.decode(ser_msg)
+				# print(msg.hex())
+				print(status)
+				print(ser_msg)
+				if (status):
+					good_data = True
+				else:
+					ser.reset_input_buffer()
+			for i in range(0, 12, 2):
+				encoderAngle[i//2] = (msg[i]<<8) | msg[i+1]
+			print(encoderAngle)
+		
 	except KeyboardInterrupt:
             ser.close()
+	
+	
+if __name__ =='__main__':
+	init_serial('/dev/ttyTHS1', 38400)
+	read_encoder_values()
+	
+	
+	
 			
