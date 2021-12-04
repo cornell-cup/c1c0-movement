@@ -36,18 +36,20 @@ def read_encoder_values():
 	encoderAngle = [0,0,0,0,0,0]
 	try:
 		while True:
-			 # length of message plus 16
 			good_data = False
+			# condition: until the checksum is correct
 			while (not good_data):
+				# read the serial port
 				ser_msg = ser.read(28)
+				# decode the serial message
 				msgtype, msg, status = r2p.decode(ser_msg)
-				# print(msg.hex())
-				print(status)
-				print(ser_msg)
+				# if the checksum is correct (1), then exit the while loop
 				if (status):
 					good_data = True
+				# if the checksum is wrong, reset the buffer and try again
 				else:
 					ser.reset_input_buffer()
+			# convert array of length 12 to array of length 6		
 			for i in range(0, 12, 2):
 				encoderAngle[i//2] = (msg[i]<<8) | msg[i+1]
 			print(encoderAngle)
