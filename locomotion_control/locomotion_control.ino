@@ -130,7 +130,7 @@ void loop() {
      num[3] = data[4];
      num[4] = data[5];
      float temp_left = atof(num);
-     if(abs(temp_left) <= 1) left = temp_left;
+     if(abs(temp_left) <= 1) left = temp_left; // only update value if it is valid (between -1 and 1)
 
      num[0] = data[7];
      num[1] = data[8];
@@ -138,7 +138,7 @@ void loop() {
      num[3] = data[10];
      num[4] = data[11];
      float temp_right = atof(num);
-     if(abs(temp_right) <= 1) right = temp_right;
+     if(abs(temp_right) <= 1) right = temp_right; // only update value if it is valid (between -1 and 1)
      
      Serial.println("Start Transaction");
      for (int i=0; i<29; i++){
@@ -152,6 +152,7 @@ void loop() {
  
 //  left = 0.2; // comment these out once we are receiving left and right values from the Jetson
 //  right = 0.2;
+
 //  Serial.print("Right: ");
 //  Serial.println(right);
 //  Serial.print("Left: ");
