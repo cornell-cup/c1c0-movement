@@ -80,6 +80,8 @@ void setup() {
   pinMode(cw_pin_L, OUTPUT);
   pinMode(ccw_pin_L, OUTPUT);
   pinMode(rpm_pin_L, INPUT);
+//  pinMode(LED_BUILTIN, OUTPUT);
+//  digitalWrite(LED_BUILTIN, LOW);
   
   // get current motor movement
   pid_input_L = analog_to_PID(analogRead(rpm_pin_L));
@@ -113,9 +115,15 @@ void setup() {
   // start serial
   Serial.begin(115200); 
   Serial2.begin(115200); 
+
+  while(Serial2.available() > 0){
+    Serial2.read();  
+  }
+  delay(100);
 }
 
 uint8_t num [5];
+int counter = 0;
 
 void loop() {
 
@@ -123,7 +131,7 @@ void loop() {
  if (Serial2.available() > 0) {
     Serial2.readBytes(recv_buffer, 29);
      x = r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len);
-      //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'}
+      //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'} 
      num[0] = data[1];
      num[1] = data[2];
      num[2] = data[3];
@@ -139,7 +147,7 @@ void loop() {
      num[4] = data[11];
      float temp_right = atof(num);
      if(abs(temp_right) <= 1) right = temp_right; // only update value if it is valid (between -1 and 1)
-     
+         
      Serial.println("Start Transaction");
      for (int i=0; i<29; i++){
       Serial.println(recv_buffer[i]);
@@ -149,19 +157,34 @@ void loop() {
       Serial.println(data[i]);
       }
  }
- 
-//  left = 0.2; // comment these out once we are receiving left and right values from the Jetson
-//  right = 0.2;
 
-//  Serial.print("Right: ");
-//  Serial.println(right);
-//  Serial.print("Left: ");
-//  Serial.println(left);
+//  if (counter < 10000){
+//    left = 0.2; // comment these out once we are receiving left and right values from the Jetson
+//    right = 0.2;
+//  }
+//  else if (counter >= 10000 && counter <= 20000){
+//    left = 0.15; // comment these out once we are receiving left and right values from the Jetson
+//    right = -0.15;
+//  }
+//  else {
+//    left = -0.15; // comment these out once we are receiving left and right values from the Jetson
+//    right = 0.15;
+//  }
+  
 
   Serial.print("Right: ");
   Serial.println(right);
   Serial.print("Left: ");
   Serial.println(left);
+////  digitalWrite(LED_BUILTIN, LOW);
+
+
+//  if(left == 0.25){
+//    digitalWrite(LED_BUILTIN, HIGH);
+//    }
+//   else{
+//    digitalWrite(LED_BUILTIN, LOW);
+//    }
   // set directions
   cw_R = (right > 0);
   cw_L = (left < 0);
@@ -178,6 +201,11 @@ void loop() {
   left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
   right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
 
+//  Serial.print("Left PWM: ");
+//  Serial.println(left_pwm);
+//  Serial.print("Right PWM: ");
+//  Serial.println(right_pwm);
+
   analogWrite(pwm_pin_L,left_pwm); //253 max
   analogWrite(pwm_pin_R,right_pwm); //253 max
 
@@ -190,4 +218,6 @@ void loop() {
   // must call compute pid every loop - will only actually run every SetSampleTime ms
   pid_R->Compute();
   pid_L->Compute();
+
+  counter++;
 }
