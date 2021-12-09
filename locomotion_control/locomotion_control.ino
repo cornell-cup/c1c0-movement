@@ -40,6 +40,8 @@ int32_t x = 1000;
 int i = 0;
 uint32_t data_len = 13;
 
+int counter = 0;
+
 // pin defintions
 int pwm_pin_R = 11;
 int pwm_pin_L = 3;
@@ -80,6 +82,8 @@ void setup() {
   pinMode(cw_pin_L, OUTPUT);
   pinMode(ccw_pin_L, OUTPUT);
   pinMode(rpm_pin_L, INPUT);
+//  pinMode(LED_BUILTIN, OUTPUT);
+//  digitalWrite(LED_BUILTIN, LOW);
   
   // get current motor movement
   pid_input_L = analog_to_PID(analogRead(rpm_pin_L));
@@ -107,12 +111,17 @@ void setup() {
   // init as not moving
   left = 0.0;
   right = 0.0;
-//  prev_left = 0.0;
-//  prev_right =  0.0;
+
+  counter = 0;
     
   // start serial
   Serial.begin(115200); 
   Serial2.begin(115200); 
+
+  while(Serial2.available() > 0){
+    Serial2.read();  
+  }
+  delay(100);
 }
 
 uint8_t num [5];
@@ -123,14 +132,14 @@ void loop() {
  if (Serial2.available() > 0) {
     Serial2.readBytes(recv_buffer, 29);
      x = r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len);
-      //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'}
+      //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'} 
      num[0] = data[1];
      num[1] = data[2];
      num[2] = data[3];
      num[3] = data[4];
      num[4] = data[5];
      float temp_left = atof(num);
-     if(abs(temp_left) <= 1) left = temp_left;
+     if(abs(temp_left) <= 1) left = temp_left; // only update value if it is valid (between -1 and 1)
 
      num[0] = data[7];
      num[1] = data[8];
@@ -138,8 +147,8 @@ void loop() {
      num[3] = data[10];
      num[4] = data[11];
      float temp_right = atof(num);
-     if(abs(temp_right) <= 1) right = temp_right;
-     
+     if(abs(temp_right) <= 1) right = temp_right; // only update value if it is valid (between -1 and 1)
+         
      Serial.println("Start Transaction");
      for (int i=0; i<29; i++){
       Serial.println(recv_buffer[i]);
@@ -149,18 +158,39 @@ void loop() {
       Serial.println(data[i]);
       }
  }
- 
-//  left = 0.2; // comment these out once we are receiving left and right values from the Jetson
-//  right = 0.2;
-//  Serial.print("Right: ");
-//  Serial.println(right);
-//  Serial.print("Left: ");
-//  Serial.println(left);
+
+  if (counter < 500){
+    left = 0.2; // comment these out once we are receiving left and right values from the Jetson
+    right = 0.2;
+    Serial.println("                    First");
+  }
+  else if (counter >= 500 && counter <= 1000){
+    left = 0.15; // comment these out once we are receiving left and right values from the Jetson
+    right = -0.15;
+    Serial.println("                                    Second");
+  }
+  else {
+    left = -0.15; // comment these out once we are receiving left and right values from the Jetson
+    right = 0.15;
+    Serial.println("                                                          Third");
+  }
+//  left = 0.15; // comment these out once we are receiving left and right values from the Jetson
+//  right = -0.15;
 
   Serial.print("Right: ");
   Serial.println(right);
   Serial.print("Left: ");
   Serial.println(left);
+////  digitalWrite(LED_BUILTIN, LOW);
+
+
+//  if(left == 0.25){
+//    digitalWrite(LED_BUILTIN, HIGH);
+//    }
+//   else{
+//    digitalWrite(LED_BUILTIN, LOW);
+//    }
+
   // set directions
   cw_R = (right > 0);
   cw_L = (left < 0);
@@ -174,8 +204,15 @@ void loop() {
   pid_input_R = analog_to_PID(analogRead(rpm_pin_R));
   
   // write pwm to drivers
-  left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
-  right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
+//  left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
+//  right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
+  left_pwm = PID_to_pwm(pid_setpoint_L);
+  right_pwm = PID_to_pwm(pid_setpoint_R);
+
+  Serial.print("Left PWM: ");
+  Serial.println(left_pwm);
+  Serial.print("Right PWM: ");
+  Serial.println(right_pwm);
 
   analogWrite(pwm_pin_L,left_pwm); //253 max
   analogWrite(pwm_pin_R,right_pwm); //253 max
@@ -183,10 +220,29 @@ void loop() {
   // write direction pins on drivers
   digitalWrite(cw_pin_R, cw_R); //Direction --forward
   digitalWrite(cw_pin_L, cw_L); //Direction
-  digitalWrite(ccw_pin_R, ~cw_R); //Direction
-  digitalWrite(ccw_pin_L, ~cw_L); //Direction
+  digitalWrite(ccw_pin_R, !cw_R); //Direction
+  digitalWrite(ccw_pin_L, !cw_L); //Direction
+
+//  Serial.print("cw_R pin: ");
+//  Serial.println(digitalRead(cw_pin_R));
+//  Serial.print("ccw_R pin: ");
+//  Serial.println(digitalRead(ccw_pin_R));
+//  Serial.print("cw_L pin: ");
+//  Serial.println(digitalRead(cw_pin_L));
+//  Serial.print("ccw_L pin: ");
+//  Serial.println(digitalRead(ccw_pin_L));
+//  Serial.print("cw_R pin: ");
+//  Serial.println(cw_R);
+//  Serial.print("ccw_R pin: ");
+//  Serial.println(!cw_R);
+//  Serial.print("cw_L pin: ");
+//  Serial.println(cw_L);
+//  Serial.print("ccw_L pin: ");
+//  Serial.println(!cw_L);
 
   // must call compute pid every loop - will only actually run every SetSampleTime ms
   pid_R->Compute();
   pid_L->Compute();
+
+  counter++;
 }
