@@ -1,5 +1,6 @@
 {
-    "port": "COM6",
+    "port": "COM10",
     "board": "arduino:sam:arduino_due_x",
-    "sketch": "arduino_requesting\\arduino_requesting.ino"
+    "sketch": "modified_protocol_test_arduino_decode_receiving.ino",
+    "output": "modified_protocol_test_arduino_decode_receiving"
 }
