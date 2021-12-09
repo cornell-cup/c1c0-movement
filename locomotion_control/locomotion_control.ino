@@ -40,6 +40,8 @@ int32_t x = 1000;
 int i = 0;
 uint32_t data_len = 13;
 
+int counter = 0;
+
 // pin defintions
 int pwm_pin_R = 11;
 int pwm_pin_L = 3;
@@ -109,8 +111,8 @@ void setup() {
   // init as not moving
   left = 0.0;
   right = 0.0;
-//  prev_left = 0.0;
-//  prev_right =  0.0;
+
+  counter = 0;
     
   // start serial
   Serial.begin(115200); 
@@ -123,7 +125,6 @@ void setup() {
 }
 
 uint8_t num [5];
-int counter = 0;
 
 void loop() {
 
@@ -158,19 +159,23 @@ void loop() {
       }
  }
 
-//  if (counter < 10000){
-//    left = 0.2; // comment these out once we are receiving left and right values from the Jetson
-//    right = 0.2;
-//  }
-//  else if (counter >= 10000 && counter <= 20000){
-//    left = 0.15; // comment these out once we are receiving left and right values from the Jetson
-//    right = -0.15;
-//  }
-//  else {
-//    left = -0.15; // comment these out once we are receiving left and right values from the Jetson
-//    right = 0.15;
-//  }
-  
+  if (counter < 500){
+    left = 0.2; // comment these out once we are receiving left and right values from the Jetson
+    right = 0.2;
+    Serial.println("                    First");
+  }
+  else if (counter >= 500 && counter <= 1000){
+    left = 0.15; // comment these out once we are receiving left and right values from the Jetson
+    right = -0.15;
+    Serial.println("                                    Second");
+  }
+  else {
+    left = -0.15; // comment these out once we are receiving left and right values from the Jetson
+    right = 0.15;
+    Serial.println("                                                          Third");
+  }
+//  left = 0.15; // comment these out once we are receiving left and right values from the Jetson
+//  right = -0.15;
 
   Serial.print("Right: ");
   Serial.println(right);
@@ -185,6 +190,7 @@ void loop() {
 //   else{
 //    digitalWrite(LED_BUILTIN, LOW);
 //    }
+
   // set directions
   cw_R = (right > 0);
   cw_L = (left < 0);
@@ -198,13 +204,15 @@ void loop() {
   pid_input_R = analog_to_PID(analogRead(rpm_pin_R));
   
   // write pwm to drivers
-  left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
-  right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
+//  left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
+//  right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
+  left_pwm = PID_to_pwm(pid_setpoint_L);
+  right_pwm = PID_to_pwm(pid_setpoint_R);
 
-//  Serial.print("Left PWM: ");
-//  Serial.println(left_pwm);
-//  Serial.print("Right PWM: ");
-//  Serial.println(right_pwm);
+  Serial.print("Left PWM: ");
+  Serial.println(left_pwm);
+  Serial.print("Right PWM: ");
+  Serial.println(right_pwm);
 
   analogWrite(pwm_pin_L,left_pwm); //253 max
   analogWrite(pwm_pin_R,right_pwm); //253 max
@@ -212,8 +220,25 @@ void loop() {
   // write direction pins on drivers
   digitalWrite(cw_pin_R, cw_R); //Direction --forward
   digitalWrite(cw_pin_L, cw_L); //Direction
-  digitalWrite(ccw_pin_R, ~cw_R); //Direction
-  digitalWrite(ccw_pin_L, ~cw_L); //Direction
+  digitalWrite(ccw_pin_R, !cw_R); //Direction
+  digitalWrite(ccw_pin_L, !cw_L); //Direction
+
+//  Serial.print("cw_R pin: ");
+//  Serial.println(digitalRead(cw_pin_R));
+//  Serial.print("ccw_R pin: ");
+//  Serial.println(digitalRead(ccw_pin_R));
+//  Serial.print("cw_L pin: ");
+//  Serial.println(digitalRead(cw_pin_L));
+//  Serial.print("ccw_L pin: ");
+//  Serial.println(digitalRead(ccw_pin_L));
+//  Serial.print("cw_R pin: ");
+//  Serial.println(cw_R);
+//  Serial.print("ccw_R pin: ");
+//  Serial.println(!cw_R);
+//  Serial.print("cw_L pin: ");
+//  Serial.println(cw_L);
+//  Serial.print("ccw_L pin: ");
+//  Serial.println(!cw_L);
 
   // must call compute pid every loop - will only actually run every SetSampleTime ms
   pid_R->Compute();
