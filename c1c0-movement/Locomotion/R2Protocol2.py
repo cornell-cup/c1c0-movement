@@ -1,5 +1,9 @@
 import struct
 
+"""
+See C1-C0 Fall 2021 documentation for a verbose description of R2Protocol.
+"""
+
 crc16_table = [
   0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
   0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
@@ -36,6 +40,17 @@ crc16_table = [
 ]
 
 def crc16(data):
+  """
+  Computes the crc16 checksum of the data packet. 
+  The checksum is used for checking data integrity after a packet transfer over the serial line.
+  This is done by calculating the checksum before the packet is sent, putting this checksum inside the packet, then
+  taking the checksum of the data after the packet is decoded, and comparing the two values.
+  
+  More info on crc checksums can be found here: https://en.wikipedia.org/wiki/Cyclic_redundancy_check
+  
+  Parameter data: The encoded packet
+  Precondition: data is an array of bytes packed using the struct.pack() function.
+  """
   crc = 0xffff
   for c in data:
     crc = ((crc << 8) ^ crc16_table[((crc >> 8) ^ c) & 0xff]) & 0xffff
@@ -46,6 +61,17 @@ def crc16(data):
   return crc
 
 def encode(type, data):
+  """
+  Encodes a data packet into an R2Protocol encoded packet to be sent over a serial or other communication interface.
+  Utilizes the python struct library (https://docs.python.org/3/library/struct.html) to take head and tail bits, the checksum, data type, 
+  data length, and data values and assembles them into a contiguous packet of bytes.
+  
+  Parameter type: The user defined type of the data (Ex: ARM or LOCO)
+  Precondition: type is a byte string with no more than 4 characters (Ex: b'ARM')
+  
+  Parameter data: The data values to be sent to the connected device
+  Precondition: Data is an array of bytes (Ex: b'\x00\x01\xee\xf0')
+  """
   checksum = crc16(data)
   return struct.pack("> 3B H 4s I {}s 3B".format(len(data)),
       0xa2, 0xb2, 0xc2, checksum, type, len(data), data, 0xd2, 0xe2, 0xf2)
@@ -54,7 +80,7 @@ def encode(type, data):
 def decode(data):
   '''
   Confirm checksum and return a tuple containing message type, message data, and checksum status
-  Checksum stats: 0 for incorrect checksum, 1 for correct checksum
+  Checksum status: 0 for incorrect checksum, 1 for correct checksum
   Argument: bytes containing a packet using R2Protocol
   Decode requires no data with length greater than 4 bytes in length be received
   R2Protocol dictates that idx 3 contains checksum, idx 4 contains type, 

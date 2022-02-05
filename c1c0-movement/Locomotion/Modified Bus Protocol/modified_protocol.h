@@ -167,7 +167,7 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffe
   *checksum = (buffer[index + 3] << 8) | buffer[index + 4];
 
   // Type
-  memcpy(type, buffer + 6, 4);
+  memcpy(type, buffer + index + 6, 4);
 
   // Length of data (big endian)
   *data_len = (buffer[index + 10] << 24) | (buffer[index + 11] << 16) | (buffer[index + 12] << 8) | buffer[index + 13];
@@ -179,7 +179,7 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffe
   if (buffer[index + *data_len + 14] == 0xd2 && buffer[index + *data_len + 15] == 0xe2 && buffer[index + *data_len + 16] == 0xf2) {
     return index + *data_len + R2P_HEADER_SIZE;
   }
-  *isRequest = (strncmp(type, "rqst", 4) == 0);
+  //*isRequest = (strncmp(type, "rqst", 4) == 0);
   return -1;
 }
 /**

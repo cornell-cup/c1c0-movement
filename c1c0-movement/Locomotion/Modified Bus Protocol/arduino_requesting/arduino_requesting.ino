@@ -1,4 +1,4 @@
-#include "C:\Users\Liam Kain\Documents\Project Team\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
+#include "C:\Users\Liam Kain\Documents\ProjectTeam\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
 /*
 
 
@@ -49,7 +49,7 @@ void loop() {
     {
       Serial1.readBytes(recv_buffer,R2P_HEADER_SIZE + dataLength); // reads the buffer data storing a buffer_len length of data in in recv_buffer
       r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len, &isRequest ); // decoding received data
-      printmsg();
+
       }
       if(strncmp(type,"rqst",4)==0){
         if(data[0] == 8)
