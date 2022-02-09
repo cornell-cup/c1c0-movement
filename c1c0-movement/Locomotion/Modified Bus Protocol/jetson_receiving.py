@@ -8,7 +8,9 @@ ser = serial.Serial(
 )
 ID = 4
 while(1): ## loop takes in data sent from jetson. In the decode method, the message is parsed if the ID variable matches the address of the sent message
-    x = ser.read_until(expected = b'\xd2\xe2\xf2')
-    s = r2p.decode(x)
-    print(s)
+	x = ser.read_until(expected = b'\xd2\xe2\xf2')
+	(typ,msg,status,address) = r2p.decode(x)
+	typ = typ.decode()
+	s = typ,msg,status,address
+	print(s)
 

@@ -22,7 +22,7 @@ while(1):
 	if(pattern == "linear"):
 		for f in range(0,3):
 			for i in range(2,6):
-				msg = r2p.encode(b"Lite",(i).to_bytes(1,'big'),data3)
+				msg = r2p.encode(b"Lite", (i).to_bytes(1,'big'),data)
 				ser.write(msg)
 				time.sleep(.2)
 			for i in range(2,6):
@@ -58,25 +58,26 @@ while(1):
 				ser.write(msg2)
 				time.sleep(.2)
 	elif(pattern == "all"):
-		for f in range(0,5):
-			msg = r2p.encode(b"Lite",(2).to_bytes(1,'big'),data3)
-			ser.write(msg)
-			msg = r2p.encode(b"Lite",(3).to_bytes(1,'big'),data3)
-			ser.write(msg)
-			msg = r2p.encode(b"Lite",(4).to_bytes(1,'big'),data3)
-			ser.write(msg)
-			msg = r2p.encode(b"Lite",(5).to_bytes(1,'big'),data3)
-			ser.write(msg)
-			time.sleep(.5)
-			msg = r2p.encode(b"Lite",(2).to_bytes(1,'big'),data)
-			ser.write(msg)
-			msg = r2p.encode(b"Lite",(3).to_bytes(1,'big'),data)
-			ser.write(msg)
-			msg = r2p.encode(b"Lite",(4).to_bytes(1,'big'),data)
-			ser.write(msg)
-			msg = r2p.encode(b"Lite",(5).to_bytes(1,'big'),data)
-			ser.write(msg)
-			time.sleep(.5)
+		while(1):
+			for f in range(0,5):
+				msg = r2p.encode(b"Lite",(2).to_bytes(1,'big'),data3)
+				ser.write(msg)
+				msg = r2p.encode(b"Lite",(3).to_bytes(1,'big'),data3)
+				ser.write(msg)
+				msg = r2p.encode(b"Lite",(4).to_bytes(1,'big'),data3)
+				ser.write(msg)
+				msg = r2p.encode(b"Lite",(5).to_bytes(1,'big'),data3)
+				ser.write(msg)
+				time.sleep(.5)
+				msg = r2p.encode(b"Lite",(2).to_bytes(1,'big'),data)
+				ser.write(msg)
+				msg = r2p.encode(b"Lite",(3).to_bytes(1,'big'),data)
+				ser.write(msg)
+				msg = r2p.encode(b"Lite",(4).to_bytes(1,'big'),data)
+				ser.write(msg)
+				msg = r2p.encode(b"Lite",(5).to_bytes(1,'big'),data)
+				ser.write(msg)
+				time.sleep(.5)
 	elif(pattern == "test"):
 		for i in range(0,6):
 			print(i)
