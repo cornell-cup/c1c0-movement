@@ -1,10 +1,18 @@
-#include "C:\Users\Liam Kain\Documents\Project Team\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
+#include "C:\Users\Liam Kain\Documents\ProjectTeam\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
 int ID = 9;
 uint8_t send_buffer[256];
 void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
   Serial.println(int(address));
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
+  printBuff(send_buffer,written);
   Serial1.write(send_buffer, written);
+}
+void printBuff(uint8_t buf[], int len){
+  for(int i = 0; i < len; i++){
+    Serial.print(buf[i],HEX);    
+  }
+
+  Serial.println();
 }
 void setup() {
   Serial.begin(9600);
