@@ -8,7 +8,7 @@ import threading
 import Jetson.GPIO as GPIO
 ser = serial.Serial(
         port = '/dev/ttyTHS1',
-        baudrate = 115200,
+        baudrate = 38400,
 )
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(7,GPIO.OUT)
@@ -21,27 +21,27 @@ i = 0
 def send(type,address,data):
         msg = r2p.encode(type,(address).to_bytes(1,'big'),data)
         ser.write(msg)
-        #print("sending " + str(type1) + "," + str(data) + "," + str(address))
+        print("sending " + str(type1) + "," + str(data) + "," + str(address))
 tim = 0
-start2 = time.time()
-for i in range(100):
+for i in range(100):                                           	
         #print("cycle: ",i)
         start = time.time()
         send(type1,3,data)
         ##waiting for message after sending
         while(1):
                 x = ser.read_until(expected = b'\xd2\xe2\xf2' )
-                end = time.time()
                 s = r2p.decode(x)
-                #print("I'm receiving:",s)
+                print("I'm receiving:",s)
                 break
+        send(type1,4,data)
+        ##waiting for message after sending
+        while(1):
+                x = ser.read_until(expected = b'\xd2\xe2\xf2' )
+                print(x)
+                s = r2p.decode(x)
+                print("I'm receiving:",s)
+                break
+        end = time.time()
         #print()
         tim += end-start 
-end2 = time.time()
-print(tim/ 100)
-print((end2-start2)/100)
-
-	
-	
-
-
+print(tim/200)

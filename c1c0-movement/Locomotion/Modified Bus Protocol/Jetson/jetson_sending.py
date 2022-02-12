@@ -7,7 +7,7 @@ ser = serial.Serial(
     port = '/dev/ttyTHS1',
     baudrate = 9600,
 )
-address = 4
+address = 3
 address2 = 8
 data = b"\x09\x09"
 data2 = b"\x0a\x0a"
