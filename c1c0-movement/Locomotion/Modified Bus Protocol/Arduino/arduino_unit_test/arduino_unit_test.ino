@@ -1,13 +1,11 @@
 #include "C:\Users\Liam Kain\Documents\ProjectTeam\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
 /*
-
-
 Dark: address = 8
 Lite: address = 4
 */
-const uint8_t dataLength = 200; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
+const uint8_t dataLength = 1000; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
-uint8_t address = 3; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
+uint8_t address = 4; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
 uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
 char type[5]; //character array which the type literal will be inserted into
@@ -22,7 +20,7 @@ void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len)
 }
 void setup() {
   Serial.begin(9600);
-  Serial1.begin(115200);
+  Serial1.begin(38400);
   pinMode(13,OUTPUT);
 }
 uint16_t t;
