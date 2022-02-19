@@ -3,7 +3,7 @@
 Dark: address = 8
 Lite: address = 4
 */
-const uint8_t dataLength = 1000; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
+const uint32_t dataLength = 10; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
 uint8_t address = 4; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
@@ -46,6 +46,14 @@ void loop() {
     if(Serial1.available() > 0) //checks if there is data in the serial buffer to be read
     {
       Serial1.readBytes(recv_buffer,R2P_HEADER_SIZE + dataLength); // reads the buffer data storing a buffer_len length of data in in recv_buffer
+      Serial.println("Buffer : ");
+      /*
+      for(int i=0; i<R2P_HEADER_SIZE + dataLength; i++){
+        Serial.print(recv_buffer[i]);
+        Serial.print("  ");
+        Serial.print(i);
+      }
+      */
       r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len, &t); // decoding received data
       }
     //printmsg();

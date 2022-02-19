@@ -159,13 +159,13 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffe
   if (buffer_len - index < R2P_HEADER_SIZE) {
     return -1;
   }
-  // Save address and check if address is equal to ID
-  uint8_t address = buffer[index + 5];
-  if(address != ID)
-    return -1;
   // Checksum
   *checksum = (buffer[index + 3] << 8) | buffer[index + 4];
-
+  //Address
+  uint8_t address = buffer[index + 5];
+  // Save address and check if address is equal to ID
+  if(address != ID)
+    return -1;
   // Type
   memcpy(type, buffer + index + 6, 4);
 
@@ -179,7 +179,6 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffe
   if (buffer[index + *data_len + 14] == 0xd2 && buffer[index + *data_len + 15] == 0xe2 && buffer[index + *data_len + 16] == 0xf2) {
     return index + *data_len + R2P_HEADER_SIZE;
   }
-  //*isRequest = (strncmp(type, "rqst", 4) == 0);
   return -1;
 }
 /**
