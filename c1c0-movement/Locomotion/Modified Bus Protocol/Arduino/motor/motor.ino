@@ -40,7 +40,7 @@ void printmsg(){
   Serial.println(" ");
   
 }
-uint8_t senddata[] = {0x01, 0x02, 0x03};
+uint8_t senddata[] = {0x05, 0x06, 0x07};
 uint8_t data2[] = {0x00c,0x00b,0x00d};
 void loop() {
     if(Serial1.available() > 0) //checks if there is data in the serial buffer to be read
@@ -57,10 +57,7 @@ void loop() {
       r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len, &t); // decoding received data
       }
       //printmsg();
-      if(strncmp(type,"rqst",4)==0){
-        if(data[0] == 8)
-          send("OFF", address, senddata, 3);
-        else if(data[0] == 9)
+      if(data[0] == 1 && data[1] == 2 && data[2] == 3){
           send("ON", address, senddata, 3);
         memcpy(type,"llll", 4);
       }
