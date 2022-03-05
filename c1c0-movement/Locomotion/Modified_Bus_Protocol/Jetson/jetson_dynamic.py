@@ -9,18 +9,17 @@ ser = serial.Serial(
 )
 address = 3
 address2 = 8
-data = b"\x09\x09"
-data2 = b"\x0a\x0a"
-data3 = b"\x0b\x0b\x0c\x0b" 
-data4 = b"\x0f\x0f\x0c\x0f\x0c" 
+data = b"\x09"
+
 
 while(1):
+        data += b"\x09"
         print("controller1")
-        msg = r2p.encode(b"Lite",(3).to_bytes(1,'big'),data3)
+        msg = r2p.encode(b"Lite",(3).to_bytes(1,'big'),data)
         #msg2 = r2p.encode(b"Lite",(i).to_bytes(1,'big'),data3)
         print(msg)
         ser.write(msg)
         #ser.write(msg2)
-        time.sleep(2)
+        time.sleep(.2)
 
 
