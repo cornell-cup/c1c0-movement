@@ -12,14 +12,15 @@ ser = serial.Serial(
 )
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(7,GPIO.OUT)
-address = 4
-address2 = 8
+address = 3
+address2 = 4
 data = b'\x09'
 for i in range(9):
     data += b'\x09'
 
-data2 = b"\x08\x08"
 type1 = b"rqst"
+recvData;
+
 i = 0
 def send(type,address,data):
         msg = r2p.encode(type,(address).to_bytes(1,'big'),data)
@@ -30,16 +31,17 @@ tim = 0
 for i in range(100):                                           	
         start = time.time()
         while(1):
-                send(type1,3,data)
+                send(type1,address,data)
                 ##waiting for message after sending
                 while(1):
                         x = ser.read_until(expected = b'\xd2\xe2\xf2' )
                         s = r2p.decode(x)
+                        recvData = s[1]                        
                         s3.decode('ascii')
                         print("I'm receiving:",s)
                         break
-                if
-                send(type1,4,data)
+                if(recvData == b'\0x1\0x2\0x3'):
+                        send(type1,address2,data)
                 ##waiting for message after sending
                 while(1):
                         x = ser.read_until(expected = b'\xd2\xe2\xf2' )
