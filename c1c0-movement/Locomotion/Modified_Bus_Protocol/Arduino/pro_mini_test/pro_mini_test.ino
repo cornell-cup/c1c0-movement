@@ -17,36 +17,20 @@ uint8_t send_buffer[256];
 void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
   //Serial.println("sending stuff");
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
-  Serial1.write(send_buffer, written);
+  Serial.write(send_buffer, written);
 }
 void setup() {
-  Serial.begin(9600);
-  Serial1.begin(38400);
-  pinMode(13,OUTPUT)
+  Serial.begin(38400);
+  pinMode(13,OUTPUT);
 }
 uint16_t t;
 char s = 'a';
-void printmsg(){
-  Serial.print("Address: ") ;
-  Serial.println(address);
-  Serial.print("Type : ");
-  Serial.println(type);
-  Serial.print("Length: ") ;
-  Serial.println(data_len);
-  Serial.println("Data : ");
-  for(int i=0; i<data_len; i++){
-    Serial.print(data[i]);
-    Serial.print("  ");
-    }
-  Serial.println(" ");
-  
-}
 uint8_t senddata[] = {0x01, 0x02, 0x03};
 uint8_t data2[] = {0x00c,0x00b,0x00d};
 void loop() {
-    if(Serial1.available() > 0) //checks if there is data in the serial buffer to be read
+    if(Serial.available() > 0) //checks if there is data in the serial buffer to be read
     {
-      Serial1.readBytes(recv_buffer,R2P_HEADER_SIZE + dataLength); // reads the buffer data storing a buffer_len length of data in in recv_buffer
+      Serial.readBytes(recv_buffer,R2P_HEADER_SIZE + dataLength); // reads the buffer data storing a buffer_len length of data in in recv_buffer
       //Serial.println("Buffer : ");
       /*
       for(int i=0; i<R2P_HEADER_SIZE + dataLength; i++){
