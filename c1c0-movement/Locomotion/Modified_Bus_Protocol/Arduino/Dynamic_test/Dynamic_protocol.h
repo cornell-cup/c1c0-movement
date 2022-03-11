@@ -171,17 +171,17 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffe
 
   // Length of data (big endian)
   *data_len = (buffer[index + 10] << 24) | (buffer[index + 11] << 16) | (buffer[index + 12] << 8) | buffer[index + 13];
-
+  uint8_t* dat = (uint8_t *)malloc(sizeof(uint8_t) * *data_len);
   // Data
-  memcpy(data, buffer + index + 14, *data_len);
-
+  memcpy(dat, buffer + index + 14, *data_len);
+  data = dat;
   // Ending sequence
   if (buffer[index + *data_len + 14] == 0xd2 && buffer[index + *data_len + 15] == 0xe2 && buffer[index + *data_len + 16] == 0xf2) {
     return index + *data_len + R2P_HEADER_SIZE;
   }
   return -1;
 }
-inline int32_t r2p_dynamic_decode(const uint8_t* buffer, uint8_t ID, uint32_t buffer_len, uint16_t* checksum, char type[5], uint32_t* data_len, uint16_t* isRequest) {
+inline uint32_t r2p_dynamic_decode1(const uint8_t* buffer, uint8_t ID, uint32_t buffer_len, uint16_t* checksum, char type[5], uint32_t* data_len, uint16_t* isRequest) {
   // Search for the starting byte
   uint32_t index = 0;
   while (index < buffer_len - 2 && !(buffer[index] == 0xa2 &&
@@ -206,9 +206,39 @@ inline int32_t r2p_dynamic_decode(const uint8_t* buffer, uint8_t ID, uint32_t bu
 
   // Length of data (big endian)
   *data_len = (buffer[index + 10] << 24) | (buffer[index + 11] << 16) | (buffer[index + 12] << 8) | buffer[index + 13];
-  return -1;
+  return index;
 }
 
+
+
+
+inline int32_t r2p_dynamic_decode2(const uint8_t* buffer,uint8_t* data,uint32_t* data_len,uint32_t index,uint16_t* checksum){
+  uint32_t n;
+  // Data
+  memcpy(data, buffer, *data_len);
+
+  // Ending sequence
+  if (buffer[*data_len] == 0xd2 && buffer[*data_len + 1] == 0xe2 && buffer[*data_len + 2] == 0xf2) 
+    n = index + *data_len + R2P_HEADER_SIZE;
+  else
+    n = -1;
+
+    if (n < 0) {
+    return -1;
+  }
+
+  // A checksum of 0 signifies no checksum
+  if (*checksum == 0) {
+    return n;
+  }
+
+  // Compute the checksum and compare
+  uint16_t crc = r2p_crc16(data, *data_len);
+  if (crc == *checksum) {
+    return n;
+  }
+  return -2;
+}
 
 /**
  * Decode data into preallocated buffers.
@@ -240,135 +270,6 @@ inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffe
     return n;
   }
   return -2;
-}
-
-
-
-// FSM States
-#define R2PF_STATE_START 0
-#define R2PF_STATE_CHECKSUM 10
-#define R2PF_STATE_ADDRESS 18
-#define R2PF_STATE_TYPE 20
-#define R2PF_STATE_LENGTH 30
-#define R2PF_STATE_DATA 40
-#define R2PF_STATE_END 50
-#define R2PF_STATE_DONE 60
-//definition of message structure
-typedef struct {
-  int16_t state;
-  uint8_t* buffer;
-  uint32_t buffer_len;
-  uint32_t buffer_index;
-  uint16_t crc;
-  uint16_t checksum;
-  uint8_t address;
-  char type[4];
-  uint8_t* data;
-  uint32_t data_len;
-
-  uint8_t done;
-} r2pf_t;
-
-inline r2pf_t r2pf_init(uint8_t* buffer, uint32_t buffer_len) {
-  // TODO Check buffer length
-  return (r2pf_t) { R2PF_STATE_START, buffer, buffer_len, 0, 0xffff };
-}
-// read(state machine, data being read in, Adress of specific microcontroller)
-inline void r2pf_read(r2pf_t* fsm, uint8_t read, uint8_t ID) {
-  uint8_t* buffer = fsm->buffer;
-  switch (fsm->state) {
-    default:
-    case R2PF_STATE_START:
-      if ((fsm->buffer_index == 0 && read == 0xa2)
-          || (fsm->buffer_index == 1 && read == 0xb2)
-          || (fsm->buffer_index == 2 && read == 0xc2)) {
-        buffer[fsm->buffer_index] = read;
-        fsm->buffer_index++;
-        if (fsm->buffer_index == 3) {
-          fsm->state = R2PF_STATE_CHECKSUM;
-          fsm->done = 0;
-          fsm->crc = 0xffff;
-        }
-      }
-      else {
-        fsm->buffer_index = 0;
-      }
-      break;
-    case R2PF_STATE_CHECKSUM:
-      buffer[fsm->buffer_index] = read;
-      fsm->buffer_index++;
-      if (fsm->buffer_index == 5) {
-        fsm->checksum = (buffer[3] << 8) | buffer[4];
-        fsm->state = R2PF_STATE_ADDRESS;
-      }
-      break;
-    case R2PF_STATE_ADDRESS:
-      buffer[fsm->buffer_index] = read;
-      fsm->buffer_index++;
-      if (fsm->buffer_index == 9) {
-        fsm->address = buffer[5];
-        fsm->state = R2PF_STATE_TYPE;
-        if (buffer[5] != ID)
-            fsm->state = R2PF_STATE_START;
-      } 
-      break;
-    case R2PF_STATE_TYPE:
-      buffer[fsm->buffer_index] = read;
-      fsm->buffer_index++;
-      if (fsm->buffer_index == 10) {
-        memcpy(fsm->type, buffer + 6, 4);
-        fsm->state = R2PF_STATE_LENGTH;
-      }
-      break;
-    case R2PF_STATE_LENGTH:
-      buffer[fsm->buffer_index] = read;
-      fsm->buffer_index++;
-      if (fsm->buffer_index == 14) {
-        fsm->data_len = (buffer[10] << 24) | (buffer[11] << 16) | (buffer[12] << 8) | buffer[13];
-        if (fsm->data_len > 0) {
-          fsm->state = R2PF_STATE_DATA;
-        }
-        else {
-          fsm->state = R2PF_STATE_END;
-        }
-      }
-      break;
-    case R2PF_STATE_DATA:
-      buffer[fsm->buffer_index] = read;
-      if (fsm->crc != 0) {
-        fsm->crc = (fsm->crc << 8) ^ r2p_crc16_table[((fsm->crc >> 8) ^ read) & 0xff];
-      }
-      fsm->buffer_index++;
-      if (fsm->buffer_index == 14 + fsm->data_len) {
-        fsm->data = buffer + 14;
-        fsm->state = R2PF_STATE_END;
-
-        // Avoid a crc of 0
-        if (fsm->crc == 0) {
-          fsm->crc++;
-        }
-      }
-      break;
-    case R2PF_STATE_END:
-      if ((fsm->buffer_index == fsm->data_len + 14 && read == 0xd2)
-          || (fsm->buffer_index == fsm->data_len + 15 && read == 0xe2)
-          || (fsm->buffer_index == fsm->data_len + 16 && read == 0xf2)) {
-        buffer[fsm->buffer_index] = read;
-        fsm->buffer_index++;
-        if (fsm->buffer_index == fsm->data_len + 17) {
-          // TODO Check CRC
-          fsm->state = R2PF_STATE_START;
-          fsm->buffer_index = 0;
-          fsm->done = 1;
-        }
-      }
-      else {
-        fsm->state = R2PF_STATE_START;
-        fsm->buffer_index = 0;
-        fsm->done = 0;
-      }
-      break;
-  }
 }
 
 #endif
