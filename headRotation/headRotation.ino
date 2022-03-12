@@ -10,7 +10,7 @@ int endPos;     // variable to represent the ending position (goal) when changin
 bool absolute;  // variable to represent when the angle taken from the serial port is an absolute angle or a change in angle (1 if absolute)
 bool negative;  // variable to represent when a change in angle is negative (1 is negative)
 
-const uint8_t dataLength = 5; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
+const uint8_t dataLength = 4; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
 uint8_t address = 3; // ID address for this microcontroller. If the message does not contain this address of 3, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
