@@ -1,4 +1,4 @@
-#include "C:\Users\Liam Kain\Documents\ProjectTeam\c1c0-movement\c1c0-movement\Locomotion\Modified Bus Protocol\modified_protocol.h"
+#include "C:\Users\Liam Kain\Documents\ProjectTeam\c1c0-movement\c1c0-movement\Locomotion\Modified_Bus_Protocol\modified_protocol.h"
 int ID = 9;
 uint8_t send_buffer[256];
 void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
@@ -25,10 +25,10 @@ char s = 'a';
 void loop() {
     //sending byte array "STUFF" to address 8  
    send("ON", ID, data, 8);
-   delay(2000);
+   delay(200);
    //sending byte array "STUFF" to address 10
    send("ON", ID, data2, 8);
-   delay(2000);
+   delay(200);
    
 }
 
