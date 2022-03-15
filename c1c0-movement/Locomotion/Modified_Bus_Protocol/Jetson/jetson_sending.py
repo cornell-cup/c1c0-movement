@@ -21,6 +21,6 @@ while(1):
         print(msg)
         ser.write(msg)
         #ser.write(msg2)
-        time.sleep(2)
+        time.sleep(.2)
 
 
