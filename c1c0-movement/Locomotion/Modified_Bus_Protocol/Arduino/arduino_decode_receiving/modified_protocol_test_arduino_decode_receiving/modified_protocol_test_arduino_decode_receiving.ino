@@ -7,7 +7,7 @@ uint8_t address = 3; // ID address for this microcontroller. If the message does
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
 uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
 char type[5]; //character array which the type literal will be inserted into
-uint8_t data[2]; //the array which data will be inserted into
+uint8_t data[3]; //the array which data will be inserted into
 uint32_t data_len; // integer for length of data to be inserted into
 uint8_t datalast;
 int i = 0;
