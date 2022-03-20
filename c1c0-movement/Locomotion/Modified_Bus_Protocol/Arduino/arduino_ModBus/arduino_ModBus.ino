@@ -8,8 +8,7 @@ void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len)
   Serial.println(int(address));
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
   printBuff(send_buffer,written);
-  Serial1.
-  write(send_buffer, written);
+  Serial1.write(send_buffer, written);
   delay(10);
   digitalWrite(13,LOW);
 }
