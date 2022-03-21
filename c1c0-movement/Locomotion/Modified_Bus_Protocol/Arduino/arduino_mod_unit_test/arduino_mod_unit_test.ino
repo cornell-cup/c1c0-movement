@@ -6,7 +6,7 @@ Lite: address = 4
 */
 const uint32_t dataLength = 10; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
-uint8_t address = 4; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
+uint8_t address = 6; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
 uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
 char type[5]; //character array which the type literal will be inserted into
@@ -21,13 +21,25 @@ void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len)
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
   //printBuff(send_buffer,written);
   Serial1.write(send_buffer, written);
-  delay(10);
+  delay(100);
   digitalWrite(13,LOW);
+}
+void send2(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
+  pinMode(18,OUTPUT);
+  REG_PIOA_PDR |= (0x01 << 11);
+  //delay(100);
+  Serial.println(int(address));
+  uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
+  //printBuff(send_buffer,written);
+  Serial1.write(send_buffer, written);
+  delay(10);
+  pinMode(18,INPUT);
 }
 void setup() {
   Serial.begin(9600);
   Serial1.begin(115200);
   pinMode(13,INPUT);
+  pinMode(18,INPUT);
 }
 uint16_t t;
 char s = 'a';
@@ -67,12 +79,12 @@ void loop() {
  
       if(strncmp(type,"rqst",4)==0){
         if(data[0] == 8){
-          send("OFF", address, senddata, 3);   
+          send2("OFF", address, senddata, 3);   
         }
 
         else if(data[0] == 9){
           Serial.println("Ready");
-          send("ON", address, senddata, 3);
+          send2("ON", address, senddata, 3);
           Serial.println("Done sending");
           memcpy(type,"llll", 4);
         }
