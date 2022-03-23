@@ -8,14 +8,14 @@ import threading
 import Jetson.GPIO as GPIO
 ser = serial.Serial(
         port = '/dev/ttyTHS1',
-        baudrate = 38400,
+        baudrate = 115200,
 )
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(7,GPIO.OUT)
 address = 4
 address2 = 8
 data = b'\x09'
-for i in range(999):
+for i in range(9):
     data += b'\x09'
 
 data2 = b"\x08\x08"
@@ -40,17 +40,25 @@ for i in range(100):
         ##waiting for message after sending
         while(1):
                 x = ser.read_until(expected = b'\xd2\xe2\xf2' )
-                print(x)
                 s = r2p.decode(x)
                 print("I'm receiving:",s)
                 break
-        send(type1,4,data)
+        send(type1,5,data)
         ##waiting for message after sending
         while(1):
                 x = ser.read_until(expected = b'\xd2\xe2\xf2' )
                 s = r2p.decode(x)
                 print("I'm receiving:",s)
                 break
+        
+        send(type1,6,data)
+        ##waiting for message after sending
+        while(1):
+                x = ser.read_until(expected = b'\xd2\xe2\xf2' )
+                s = r2p.decode(x)
+                print("I'm receiving:",s)
+                break
+        
         '''
         send(type1,6,data)
         ##waiting for message after sending
@@ -64,4 +72,4 @@ for i in range(100):
         end = time.time()
         #print()
         tim += end-start 
-print(tim/200)
+print(tim/400)
