@@ -16,8 +16,9 @@ void printBuff(uint8_t buf[], int len){
 }
 void setup() {
   Serial.begin(9600);
-  Serial1.begin(9600);
+  Serial1.begin(115200);
   pinMode(13,OUTPUT);
+  pinMode(18,OUTPUT);
 }
 uint8_t data[] = {0x00d,0x00b,0x00c};
 uint8_t data2[] = {0x00c,0x00b,0x00d};
@@ -26,6 +27,7 @@ void loop() {
     //sending byte array "STUFF" to address 8  
    send("ON", ID, data, 8);
    delay(200);
+   //REG_PIOA_PDR |= (0x01 << 11);
    //sending byte array "STUFF" to address 10
    send("ON", ID, data2, 8);
    delay(200);
