@@ -146,7 +146,7 @@ inline int32_t r2p_encode(const char type[5],uint8_t address, const uint8_t* dat
  * @return  Number of bytes read, -1 if failed to parse
  */
 
-inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len, uint16_t* isRequest) {
+inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Search for the starting byte
   uint32_t index = 0;
   while (index < buffer_len - 2 && !(buffer[index] == 0xa2 &&
@@ -193,9 +193,9 @@ inline int32_t r2p_decode_nocs(const uint8_t* buffer, uint8_t ID, uint32_t buffe
  * @return  Number of bytes read, -1 if failed to parse, -2 if failed checksum
  */
 
-inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len, uint16_t* isRequest) {
+inline int32_t r2p_decode(const uint8_t* buffer, uint8_t address, uint32_t buffer_len, uint16_t* checksum, char type[5], uint8_t* data, uint32_t* data_len) {
   // Decode without checking the checksum first
-  uint32_t n = r2p_decode_nocs(buffer, address, buffer_len, checksum, type, data, data_len,isRequest);
+  uint32_t n = r2p_decode_nocs(buffer, address, buffer_len, checksum, type, data, data_len);
   if (n < 0) {
     return -1;
   }
