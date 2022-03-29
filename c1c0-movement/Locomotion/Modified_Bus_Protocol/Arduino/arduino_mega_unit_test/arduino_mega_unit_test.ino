@@ -9,7 +9,7 @@ Lite: address = 4
 uint32_t* PDR = (uint32_t*)0x400E0E04; 
 const uint32_t dataLength = 10; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
-uint8_t address = 5; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
+uint8_t address = 6; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
 uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
 char type[5]; //character array which the type literal will be inserted into
@@ -36,7 +36,7 @@ uint8_t senddata[10];
 /* Sends data with modified protocol*/
 void send2(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
   pinMode(18,OUTPUT);
-  *PDR |= (0x01 << 11);
+  //*PDR |= (0x01 << 11);
   //REG_PIOA_PDR |= (0x01 << 11);
   //delay(100);
   //Serial.println(int(address));
