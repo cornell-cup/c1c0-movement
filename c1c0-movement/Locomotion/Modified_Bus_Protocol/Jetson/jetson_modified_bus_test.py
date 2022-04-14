@@ -8,7 +8,7 @@ import threading
 import Jetson.GPIO as GPIO
 ser = serial.Serial(
         port = '/dev/ttyTHS1',
-        baudrate = 115200,
+        baudrate = 38400,
 )
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(7,GPIO.OUT)
@@ -50,7 +50,6 @@ for i in range(100):
                 s = r2p.decode(x)
                 print("I'm receiving:",s)
                 break
-        
         send(type1,6,data)
         ##waiting for message after sending
         while(1):
