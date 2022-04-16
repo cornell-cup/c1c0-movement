@@ -1,23 +1,21 @@
 #include "C:\Users\Liam Kain\Documents\ProjectTeam\c1c0-movement\c1c0-movement\Locomotion\Modified_Bus_Protocol\modified_protocol.h"
-
+#define TX 17
 int ID = 4;
 uint8_t send_buffer[256];
 void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
-  pinMode(24,OUTPUT);
+  pinMode(17,OUTPUT);
   //delay(1000);
-  Serial6.begin(38400);
-  
-    
+  Serial4.begin(38400);
   //delay(10);
   Serial.println(int(address));
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
   printBuff(send_buffer,written);
-  Serial6.write(send_buffer, written);
+  Serial4.write(send_buffer, written);
 
   //Serial.println("Bytes Written: " + String(written));
 //  delay(30);
-  Serial6.flush();
-  pinMode(24,INPUT);
+  Serial4.flush();
+  pinMode(17,INPUT);
 }
 void printBuff(uint8_t buf[], int len){
   for(int i = 0; i < len; i++){
@@ -28,12 +26,12 @@ void printBuff(uint8_t buf[], int len){
 }
 void setup() {
   Serial.begin(9600);
-  Serial6.begin(115200);
+  Serial4.begin(38400);
   pinMode(13,OUTPUT);
   
-  pinMode(24,INPUT);
+  pinMode(17,INPUT);
   while(Serial6.available() > 0)
-    Serial6.read();
+    Serial4.read();
   //GPIO_GDIR |= (1<<17);
 }
 uint8_t data[] = {0x0d,0x0b,0x0c};
