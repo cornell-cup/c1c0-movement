@@ -32,13 +32,12 @@ for i in range(99):
         send(type1,address2,data)
         ##waiting for message after sending
         while(1):
-                while(ser.inWaiting()):
-                        x = ser.read_until(expected = b'\xd2\xe2\xf2' )
-                        #x = ser.read(29)
-                        print(x)
-                        s = r2p.decode(x)
-                        print("I'm receiving:",s)
-                        #break
+                x = ser.read_until(expected = b'\xd2\xe2\xf2' )
+                #x = ser.read(29)
+                print(x)
+                s = r2p.decode(x)
+                print("I'm receiving:",s)
+                #break
                 '''
                 x = ser.read(30)
                 #x = ser.read_until(expected = b'\xd2\xe2\xf2' )

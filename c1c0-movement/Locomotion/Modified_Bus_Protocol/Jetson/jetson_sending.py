@@ -5,7 +5,7 @@ import time
 import modified_protocol2 as r2p
 ser = serial.Serial(
     port = '/dev/ttyTHS1',
-    baudrate = 115200,
+    baudrate = 38400,
 )
 address = 3
 address2 = 6
