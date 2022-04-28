@@ -5,7 +5,7 @@ uint16_t token = 2;
 uint32_t* PDR = (uint32_t*)0x400E0E04; 
 const uint32_t dataLength = 1; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
-uint8_t address = 1; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
+uint8_t address = 2; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
 uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
 char type[5]; //character array which the type literal will be inserted into
@@ -92,13 +92,15 @@ void loop() {
 
     }
     if(token == 1){
+      token = 2;
       sendEnter();
-      token = 2;
     }
-    send2("ON", address, senddata, send_data_len);
-    if(token == 0){
-      sendExit();
+ 
+   send2("ON", address, senddata, send_data_len);
+   if(token == 0){
       token = 2;
+      sendExit();
+
     }
 }
       

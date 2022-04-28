@@ -3,7 +3,7 @@
 
 const uint8_t dataLength = 3; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
-uint8_t address = 9; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
+uint8_t address = 3; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
 uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
 char type[5]; //character array which the type literal will be inserted into
@@ -46,6 +46,7 @@ void printBuff(uint8_t buf[], int len){
   Serial.println();
 }
 void loop() {
+  
     if(Serial1.available() > 0) //checks if there is data in the serial buffer to be read
     {
       
@@ -57,12 +58,7 @@ void loop() {
       r2p_decode(recv_buffer,address,buffer_len,&checksum,type,data, &data_len); // decoding received data
       //r2p_decode(recv_buffer,buffer_len,&checksum,type,data, &data_len);
       printmsg();
-      if(datalast != data[0]){
-         if(data[0] == 11)
-           digitalWrite(13,HIGH);
-         else
-           digitalWrite(13,LOW);
-      }
+      
 
       }
 //A2B2C2FD9594F4E0230008DBC00211042D2E2F2

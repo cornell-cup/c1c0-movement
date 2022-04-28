@@ -9,7 +9,7 @@ Lite: address = 4
 //uint32_t* PDR = (uint32_t*)0x400E0E04; 
 const uint32_t dataLength = 10; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
-uint8_t address = 6; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
+uint8_t address = 2; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
 uint8_t recv_buffer[R2P_HEADER_SIZE + dataLength]; // this is the receiving buffer which the data will be put into, the data is 2 bytes long, so the buffer is 2 + the header size
 uint32_t buffer_len = R2P_HEADER_SIZE + dataLength; 
 char type[5]; //character array which the type literal will be inserted into
@@ -36,25 +36,28 @@ void R2Send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_le
 uint8_t senddata[10];
 /* Sends data with modified protocol*/
 void send2(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
-  pinMode(TX,OUTPUT);
+  //pinMode(TX,OUTPUT);
   //delay(1000);
-  Serial4.begin(38400);
+  //Serial4.begin(38400);
   //delay(10);
+  digitalWrite(11,HIGH);
   Serial.println(int(address));
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
-  printBuff(send_buffer,written);
+  Serial.println("Sending");
+  //printBuff(send_buffer,written);
   Serial4.write(send_buffer, written);
   //Serial.println("Bytes Written: " + String(written));
   //delay(30);
   Serial4.flush();
   delay(10);
-  pinMode(TX,INPUT);
+  digitalWrite(11,LOW);
+  //pinMode(TX,INPUT);
 
 }
 void setup() {
   Serial.begin(9600);
   Serial4.begin(38400);
-  //pinMode(TX,INPUT);
+  pinMode(11,OUTPUT);
   for(int i = 0;i < 10;i++){
     senddata[i] = 0x05;
   }
@@ -100,15 +103,18 @@ void loop() {
       //r2p_decode(recv_buffer,buffer_len,&checksum,type,data, &data_len); // decoding received data with normal protocol
       
       printmsg();
- 
+      
       if(strncmp(type,"rqst",4)==0){
         if(data[0] == 8){
-          send2("OFF", address, senddata, 3);   
+            send2("OFF", address, senddata, 3);   
         }
 
         else if(data[0] == 9){
           //Serial.println("Ready");
-          send2("ON", address, senddata, send_data_len);
+          while(1){
+            send2("ON", address, senddata, send_data_len);
+          }
+            
           //Serial.println("Done sending");
           memcpy(type,"llll", 4);
         }
@@ -116,6 +122,7 @@ void loop() {
 
       }
     }
+    send2("ON", address, senddata, send_data_len);
 }
       
     
