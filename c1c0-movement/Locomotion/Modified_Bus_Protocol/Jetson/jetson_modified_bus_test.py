@@ -43,6 +43,15 @@ for i in range(100):
                 s = r2p.decode(x)
                 print("I'm receiving:",s)
                 break
+                
+        send(type1,4,data)
+        ##waiting for message after sending
+        while(1):
+                x = ser.read_until(expected = b'\xd2\xe2\xf2' )
+                s = r2p.decode(x)
+                print("I'm receiving:",s)
+                break
+        
         '''
         send(type1,5,data)
         ##waiting for message after sending
