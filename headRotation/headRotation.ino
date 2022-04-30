@@ -1,14 +1,15 @@
 #include <Servo.h>
-#include "/Users/cecerae/Desktop/servo/headRotation/modified_protocol.h" //Change to whatever path containts the modified R2 protocol, very specific
+#include "/Users/cecerae/Desktop/Cup Robotics/c1c0-movement/headRotation/modified_protocol.h" //Change to whatever path containts the modified R2 protocol, very specific
 
 
 Servo headServo;  // create servo object to control a servo, currently set up for the HS-755HB servo (non-continuous rotation between 0 and 202 degrees
 
-int ang;        // variable to represent the current angle of the servo
-int startPos;   // variable to represent the starting position when chaning the angle of the servo
-int endPos;     // variable to represent the ending position (goal) when changing the angle of the servo
+//int ang;        // variable to represent the current angle of the servo
+//int startPos;   // variable to represent the starting position when chaning the angle of the servo
+//int endPos;     // variable to represent the ending position (goal) when changing the angle of the servo
 bool absolute;  // variable to represent when the angle taken from the serial port is an absolute angle or a change in angle (1 if absolute)
 bool negative;  // variable to represent when a change in angle is negative (1 is negative)
+int turnspeed;
 
 const uint8_t dataLength = 4; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
@@ -29,7 +30,7 @@ void setup() {
   while (Serial.available()) Serial.read();   // clear serial port to servo
   t = 0;
   
-  headServo.write(90);                          // sets a current angle 
+//  headServo.write(90);                          // sets a current angle 
 }
 
 void loop() {
@@ -42,38 +43,53 @@ void loop() {
       Serial.println(data[1]);  // absolute
       Serial.println(data[2]);  // negative
       
-      startPos = headServo.read();
+      //startPos = headServo.read();
       absolute = data[1];
       negative = data[2];
+
+      if (negative && data[0] > 0){
+        turnspeed = 90 - (90/data[0]);
+      }
+      else if (data[0] > 0){
+        turnspeed = 90 + (90/data[0]);
+      }
+      else {
+        turnspeed = 90;
+      }
+
+      headServo.write(turnspeed);
+      delay(60);
+
       
-      if (absolute){
-        endPos = int(data[0]);
-      }
-      else{
-        if(negative){
-          endPos = int(startPos - data[0]);
-        }
-        else{
-          endPos = int(startPos + data[0]);
-        }
-      }
+
       
-      if (startPos <= endPos && endPos < 202){    // change 202 to max angle as this runs when the ending position is some angle larger than the current one
-        for(int pos = startPos; pos <= endPos; pos++){
-          ang = headServo.read();                  // sets the servo position according to the scaled value
+      //if (absolute){
+     //   endPos = int(data[0]);
+     // }
+      //else{
+       // if(negative){
+       //   endPos = int(startPos - data[0]);
+       // }
+      //  else{
+       //   endPos = int(startPos + data[0]);
+      //  }
+      //}
+      
+      //if (startPos <= endPos && endPos < 202){    // change 202 to max angle as this runs when the ending position is some angle larger than the current one
+     //   for(int pos = startPos; pos <= endPos; pos++){
+     //     ang = headServo.read();                  // sets the servo position according to the scaled value
           //Serial.println(ang);
-          headServo.write(pos);
-          delay(60);                           // waits for the servo to get there
-        }
-      }
-     else if (startPos >= endPos && endPos > 0){   // change 0 to mmin angle (probably 0) as this runs when the ending position is some angle smaller than the current one
-       for(int pos = startPos; pos >= endPos; pos--){
-          ang = headServo.read();                  // sets the servo position according to the scaled value
+      //    headServo.write(pos);
+      //    delay(60);                           // waits for the servo to get there
+     //   }
+     // }
+     //else if (startPos >= endPos && endPos > 0){   // change 0 to mmin angle (probably 0) as this runs when the ending position is some angle smaller than the current one
+      // for(int pos = startPos; pos >= endPos; pos--){
+       //   ang = headServo.read();                  // sets the servo position according to the scaled value
           //Serial.println(ang);
-          headServo.write(pos);
-          delay(60);                           // waits for the servo to get there
-       }
+      //    headServo.write(pos);
+      //    delay(60);                           // waits for the servo to get there
+      // }
     }
   
   }
-}
