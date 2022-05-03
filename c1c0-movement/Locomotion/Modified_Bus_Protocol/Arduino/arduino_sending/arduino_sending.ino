@@ -4,7 +4,7 @@ uint8_t send_buffer[256];
 void send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
   Serial.println(int(address));
   uint32_t written = r2p_encode(type, address, data, data_len, send_buffer, 256);
-  //printBuff(send_buffer,written);
+  printBuff(send_buffer,written);
   Serial1.write(send_buffer, written);
 }
 void printBuff(uint8_t buf[], int len){
@@ -27,11 +27,11 @@ uint8_t data2[] = {0x0c,0x0b,0x0d};
 char s = 'a';
 void loop() {
     //sending byte array "STUFF" to address 8  
-   send("ON", ID, data, 3);
+   send("ONOF", ID, data, 3);
    delay(200);
    //REG_PIOA_PDR |= (0x01 << 11);
    //sending byte array "STUFF" to address 10
-   send("ON", ID, data2, 3);
+   send("ONOF", ID, data2, 3);
    delay(200);
    c++;
    if(c%10 == 0)

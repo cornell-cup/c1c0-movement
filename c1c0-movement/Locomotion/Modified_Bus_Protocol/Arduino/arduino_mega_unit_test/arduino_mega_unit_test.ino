@@ -7,7 +7,6 @@ Lite: address = 4
 */
 /*.022*/
 #define TX 18
-uint32_t* PDR = (uint32_t*)0x400E0E04; 
 const uint32_t dataLength = 10; // since data_len may be changed by decode, this ensures all assumed data lengths are specified manually
 uint16_t checksum; //integer for checksum to be inserted into
 uint8_t address = 2; // ID address for this microcontroller. If the message does not contain this address of 4, the message will not be processed
@@ -34,8 +33,7 @@ void R2Send(char type[5], uint8_t address, const uint8_t* data, uint32_t data_le
 uint8_t senddata[10];
 /* Sends data with modified protocol*/
 void send2(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len) {
-  //pinMode(TX,OUTPUT);
-  *PDR |= (0x01 << 11);
+  pinMode(TX,OUTPUT);
   Serial1.begin(38400);
   //delay(100);
   //Serial.println(int(address));
@@ -44,7 +42,6 @@ void send2(char type[5], uint8_t address, const uint8_t* data, uint32_t data_len
   Serial1.write(send_buffer, written);
   Serial1.flush();
   pinMode(TX,INPUT);
-
 }
 void setup() {
   Serial.begin(9600);
