@@ -83,7 +83,7 @@ def decode(data):
 
     if i >= 2049:
         # error decoding
-        return (-1, -1, -1)
+        return (-1, -1, -1, -1)
     msgchecksum = recv[3]
     address = int.from_bytes(recv[4],'big')
     msgtype = recv[5]
