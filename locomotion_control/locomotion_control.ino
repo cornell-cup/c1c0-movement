@@ -74,7 +74,14 @@ String input_str;
 
 PID *pid_R;
 PID *pid_L;
- 
+
+
+//Head Servo
+Servo headServo;  // create servo object to control a servo, currently set up for the HS-755HB servo (non-continuous rotation between 0 and 202 degrees
+bool absolute;  // variable to represent when the angle taken from the serial port is an absolute angle or a change in angle (1 if absolute)
+bool negative;  // variable to represent when a change in angle is negative (1 is negative)
+int turnspeed;
+bool head;
 
 void setup() {
   pinMode(pwm_pin_R, OUTPUT);
@@ -121,6 +128,12 @@ void setup() {
   Serial.begin(115200); 
 //  Serial2.begin(115200); 
 
+  headServo.attach(2,556,2410);                  // attaches the servo on pin 9 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
+  Serial2.begin(9600);                         // Communication to jetson
+  
+  
+  while (Serial2.available()) Serial2.read();
+
   while(Serial.available() > 0){
     Serial.read();  
   }
@@ -134,9 +147,17 @@ void loop() {
   // read the incoming byte
  if (Serial.available() > 0) {
     Serial.readBytes(recv_buffer, 29);
-
+    
      x = r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len);
       //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'} 
+     for (x=0; x<29; x=x+1){
+        if (data[x] == "h"){
+          if(data[x]+data[x+1]+data[x+2]+data[x+3] == "head"){
+            head = True;
+          }
+        }
+    }
+     
      num[0] = data[1];
      num[1] = data[2];
      num[2] = data[3];
