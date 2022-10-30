@@ -8,6 +8,7 @@
  */
 #include <PID_v1.h> //https://playground.arduino.cc/Code/PIDLibrary/
 #include "R2Protocol.h"
+#include <Servo.h>
 
 /* Define our domains:
  *  Analog domain: [0, 818] where [0, 408] indicates backwards and [410, 819] is forwards. 409 means the motor should not be moving. 
@@ -40,6 +41,14 @@ int32_t x = 1000;
 int i = 0;
 uint32_t data_len = 13;
 
+//Head Servo
+Servo headServo;  // create servo object to control a servo, currently set up for the HS-755HB servo (non-continuous rotation between 0 and 202 degrees
+bool absolute;  // variable to represent when the angle taken from the serial port is an absolute angle or a change in angle (1 if absolute)
+bool negative;  // variable to represent when a change in angle is negative (1 is negative)
+int turnspeed;
+bool head = false;
+int headdata[3];
+
 int counter = 0;
 
 bool zero_flagL;
@@ -51,8 +60,8 @@ int pwm_pin_L = 3;
 int cw_pin_R = 12;
 int ccw_pin_R = 13;
 int rpm_pin_R = A0;
-int cw_pin_L = 8;
-int ccw_pin_L = 7;
+int cw_pin_L = 4;
+int ccw_pin_L = 5;
 int rpm_pin_L = A1;
 int max_pwm = 253; // 255 caused the motor drivers to stall, so we set max as 253
 
@@ -74,14 +83,7 @@ String input_str;
 
 PID *pid_R;
 PID *pid_L;
-
-
-//Head Servo
-Servo headServo;  // create servo object to control a servo, currently set up for the HS-755HB servo (non-continuous rotation between 0 and 202 degrees
-bool absolute;  // variable to represent when the angle taken from the serial port is an absolute angle or a change in angle (1 if absolute)
-bool negative;  // variable to represent when a change in angle is negative (1 is negative)
-int turnspeed;
-bool head;
+ 
 
 void setup() {
   pinMode(pwm_pin_R, OUTPUT);
@@ -119,23 +121,20 @@ void setup() {
   // init as not moving
   left = 0.2;
   right = 0.2;
-  zero_flagL = 1;
-  zero_flagR = 1;
+  zero_flagL = 0;
+  zero_flagR = 0;
 
   counter = 0;
-    
-  // start serial
-  Serial.begin(115200); 
-//  Serial2.begin(115200); 
 
   headServo.attach(2,556,2410);                  // attaches the servo on pin 9 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
-  Serial2.begin(9600);                         // Communication to jetson
-  
-  
-  while (Serial2.available()) Serial2.read();
+    
+  // start serial
+  Serial.begin(115200);
+  Serial1.begin(115200); 
+//  Serial2.begin(115200); 
 
-  while(Serial.available() > 0){
-    Serial.read();  
+  while(Serial1.available() > 0){
+    Serial1.read();  
   }
   delay(100);
 }
@@ -145,19 +144,58 @@ uint8_t num [5];
 void loop() {
 
   // read the incoming byte
- if (Serial.available() > 0) {
-    Serial.readBytes(recv_buffer, 29);
-    
+ if (Serial1.available() > 0) {
+    Serial1.readBytes(recv_buffer, 29);
      x = r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len);
       //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'} 
-     for (x=0; x<29; x=x+1){
-        if (data[x] == "h"){
-          if(data[x]+data[x+1]+data[x+2]+data[x+3] == "head"){
-            head = True;
-          }
-        }
+      
+//     for(x=0; x<29; x=x+1){
+//        if(data[x] == "h"){
+//          if(data[x]+data[x+1]+data[x+2]+data[x+3] == "head"){
+//            head = true;
+//          }
+//       }
+//    }
+
+    if(data[0] == 'h' && data[1] == 'e' && data[2] == 'a' && data[3] == 'd'){
+      head = true;
     }
-     
+    else head = false;
+    
+    if (head){
+      headdata[0] = int(data[10])-48;
+      headdata[1] = int(data[11])-48;
+      headdata[2] = int(data[12])-48;
+      for(int i = 0; i < 3; i++){
+        Serial.print(i);
+        Serial.print(data[i+10]);
+      Serial.println(headdata[i]);
+      }
+      absolute = headdata[1];
+Serial.println(headdata[2]);
+      if(headdata[2] == 0){
+        negative = false;
+      }
+      else negative = true;
+      if(negative){
+      Serial.println("negative is true");
+      }
+      Serial.println();
+      if (negative && (headdata[0] > 0)){ //change number depending on how data array is set up, need to get negative, absolute, and
+        turnspeed = 90 - (90/5*(headdata[0]));
+        Serial.println("first if");
+      }
+      else if ((headdata[0] > 0)){
+        turnspeed = 90 + (90/5*(headdata[0]));
+        Serial.println("second if");
+      }
+      else {
+        turnspeed = 90;
+        Serial.println("else");
+      }
+          headServo.write(turnspeed);
+    }
+    else{
      num[0] = data[1];
      num[1] = data[2];
      num[2] = data[3];
@@ -185,6 +223,16 @@ void loop() {
         right = temp_right; // only update value if it is valid (between -1 and 1)
         zero_flagR = 0;
      }
+
+    for(int i = 0; i < 13; i++)
+    Serial.print(data[i]);
+//     Serial.println();
+//     Serial.print("right: "); Serial.print(right);
+//     Serial.print(" left: "); Serial.println(left);
+//     Serial.print("right zero flag: "); Serial.print(zero_flagR);
+//     Serial.print(" left zero flag: "); Serial.println(zero_flagL);
+    }
+    Serial.println();
          
 //     Serial.println("Start Transaction");
 //     for (int i=0; i<29; i++){
@@ -192,9 +240,16 @@ void loop() {
 //      }
 //      Serial.println("");
 //     for (int i=0; i<13; i++){
-//      Serial.println(data[i]);
+//      Serial.print(data[i]);
 //      }
 
+//  cw_R = (right > 0);
+//  cw_L = (left < 0);
+//  Serial.println("cw_R: " + String(cw_R));
+//  Serial.println("ccw_R: " + String(!cw_R));
+//  Serial.println("cw_L: " + String(cw_L));
+//  Serial.println("ccw_L: " + String(!cw_L));
+//  Serial.println();
  }
 // this is for a sequence test: first write .2 .2, then write .15, -.15, then write -.15, .15
 //  if (counter < 500){
@@ -222,7 +277,14 @@ void loop() {
 //  Serial.println(left);
 ////  digitalWrite(LED_BUILTIN, LOW);
 
- 
+  if (head){
+    //turnspeed = 90;
+    headServo.write(turnspeed);
+    delay(60);
+    //head = false;
+    //delay(60);
+ }
+ else{
     // set directions
   cw_R = (right > 0);
   cw_L = (left < 0);
@@ -236,8 +298,18 @@ void loop() {
   pid_input_R = analog_to_PID(analogRead(rpm_pin_R));
   
   // write pwm to drivers with PID control enabled
+
+
+  /**
   left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
   right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
+  */
+  left_pwm = 100;
+  right_pwm = 100;
+  
+//  left_pwm = 253 * left;
+//  right_pwm = 253 * right;
+  
   // comment bottom two lines in if we dont want to use our PID
 //  left_pwm = PID_to_pwm(pid_setpoint_L);
 //  right_pwm = PID_to_pwm(pid_setpoint_R);
@@ -250,6 +322,12 @@ void loop() {
   // if both motor left and right are 0, then we write 0 to both direction pins (this stops movement). We DO NOT change left and right values bc the driver will throw an error code if left or right is 0
 //  Serial.print("Zero Flags: ");
 //  Serial.println(zero_flagL & zero_flagR);
+
+//// comment this out later: (added 10/22/22)
+//  zero_flagL = 0;
+//  cw_R = 0;
+//  cw_L = 1;
+
   if(zero_flagL && zero_flagR){
     digitalWrite(cw_pin_R, 0); //Direction --forward
     digitalWrite(cw_pin_L, 0); //Direction
@@ -288,4 +366,5 @@ void loop() {
   pid_L->Compute();
 
   counter++;
+ }
 }
