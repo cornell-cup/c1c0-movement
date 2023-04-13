@@ -93,6 +93,8 @@ void setup() {
   pinMode(cw_pin_L, OUTPUT);
   pinMode(ccw_pin_L, OUTPUT);
   pinMode(rpm_pin_L, INPUT);
+
+  pinMode(10, OUTPUT);
   
   // get current motor movement
   pid_input_L = analog_to_PID(analogRead(rpm_pin_L));
@@ -123,8 +125,10 @@ void setup() {
 
   counter = 0;
 
-  headServo.attach(2,556,2410);                  // attaches the servo on pin 9 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
-    
+  // pins 5 and 6 are BAD!!!! Do not use
+  headServo.attach(10,556,2410);                  // attaches the servo on pin 10 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
+//    headServo.attach(10);    
+
   // start serial
   Serial.begin(115200);
   Serial1.begin(115200); 
@@ -138,19 +142,25 @@ void setup() {
 uint8_t num [5];
 
 void loop() {
-
   // read the incoming byte
+//  headServo.write(110);
   if (Serial1.available() > 0) {
     Serial1.readBytes(recv_buffer, 29);
     x = r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len);
     //data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'} 
 
+    
+
+    Serial.print("Checksum: ");
+    Serial.println(checksum);
+    
     if(data[0] == 'h' && data[1] == 'e' && data[2] == 'a' && data[3] == 'd'){
       head = true;
     }
     else head = false;
 
-    
+    Serial.print("Head?: ");
+    Serial.println(head);
     // ================================ Head Servo ================================
 
     if (head){
@@ -158,8 +168,6 @@ void loop() {
       headdata[1] = int(data[11])-48;
       headdata[2] = int(data[12])-48;
       for(int i = 0; i < 3; i++){
-        Serial.print(i);
-        Serial.print(data[i+10]);
       Serial.println(headdata[i]);
       }
       absolute = headdata[1];
@@ -168,16 +176,16 @@ void loop() {
         negative = false;
       }
       else negative = true;
-      if(negative){
-        Serial.println("negative is true");
-      }
-      Serial.println();
+//      if(negative){
+//        Serial.println("negative is true");
+//      }
+//      Serial.println();
       if (negative && (headdata[0] > 0)){ //change number depending on how data array is set up, need to get negative, absolute, and
-        turnspeed = 90 - (90/5*(headdata[0]));
+        turnspeed = 40;
         Serial.println("first if");
       }
       else if ((headdata[0] > 0)){
-        turnspeed = 90 + (90/5*(headdata[0]));
+        turnspeed = 140;
         Serial.println("second if");
       }
       else {
@@ -185,6 +193,10 @@ void loop() {
         Serial.println("else");
       }
         headServo.write(turnspeed);
+//        headServo.write(180);
+
+        Serial.print("turnspeed: ");
+        Serial.println(turnspeed);
     }
 
     // ================================ Motors ================================
@@ -249,6 +261,7 @@ void loop() {
   
   // write pwm to drivers with PID control enabled
 
+//  Serial.println("hello");
 
   /**
   left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
