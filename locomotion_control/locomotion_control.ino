@@ -120,8 +120,8 @@ void setup() {
   // init as not moving
   left = 0.2;
   right = 0.2;
-  zero_flagL = 0;
-  zero_flagR = 0;
+  zero_flagL = 1;
+  zero_flagR = 1;
 
   counter = 0;
 
