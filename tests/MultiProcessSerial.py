@@ -4,7 +4,7 @@ import serial
 import time
 import sys
 
-sys.path.append('/home/c1c0-main/c1c0-movement/c1c0-movement/Locomotion')
+sys.path.append('/home/c1c0-main/c1c0-ece/libs')
 import R2Protocol2 as r2p
 
 
