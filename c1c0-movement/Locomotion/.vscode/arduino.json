@@ -1,5 +1,0 @@
-{
-    "board": "arduino:sam:arduino_due_x",
-    "sketch": "Modified Bus Protocol\\modified_protocol_test_arduino_decode_receiving\\modified_protocol_test_arduino_decode_receiving.ino",
-    "port": "COM18"
-}
