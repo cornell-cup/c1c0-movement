@@ -149,109 +149,109 @@ void loop()
   //  headServo.write(110);
   if (Serial1.available() > 0)
   {
-    Serial.println("Thing");
     Serial1.readBytes(recv_buffer, 29);
-    x = r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len);
+    if(r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len) > 0){
 
-    // data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'}
+      // data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'}
 
-    Serial.print("Checksum: ");
-    Serial.println(checksum);
+      Serial.print("Checksum: ");
+      Serial.println(checksum);
 
-    if (data[0] == 'h' && data[1] == 'e' && data[2] == 'a' && data[3] == 'd')
-    {
-      head = true;
-    }
-    else
-      head = false;
-
-    Serial.print("Head?: ");
-    Serial.println(head);
-    // ================================ Head Servo ================================
-
-    if (head)
-    {
-      headdata[0] = int(data[10]) - 48;
-      headdata[1] = int(data[11]) - 48;
-      headdata[2] = int(data[12]) - 48;
-      for (int i = 0; i < 3; i++)
+      if (data[0] == 'h' && data[1] == 'e' && data[2] == 'a' && data[3] == 'd')
       {
-        Serial.println(headdata[i]);
-      }
-      absolute = headdata[1];
-      Serial.println(headdata[2]);
-      if (headdata[2] == 0)
-      {
-        negative = false;
+        head = true;
       }
       else
-        negative = true;
-      //      if(negative){
-      //        Serial.println("negative is true");
-      //      }
-      //      Serial.println();
-      if (negative && (headdata[0] > 0))
-      { // change number depending on how data array is set up, need to get negative, absolute, and
-        turnspeed = 40;
-        Serial.println("first if");
-      }
-      else if ((headdata[0] > 0))
+        head = false;
+
+      Serial.print("Head?: ");
+      Serial.println(head);
+      // ================================ Head Servo ================================
+
+      if (head)
       {
-        turnspeed = 140;
-        Serial.println("second if");
+        headdata[0] = int(data[10]) - 48;
+        headdata[1] = int(data[11]) - 48;
+        headdata[2] = int(data[12]) - 48;
+        for (int i = 0; i < 3; i++)
+        {
+          Serial.println(headdata[i]);
+        }
+        absolute = headdata[1];
+        Serial.println(headdata[2]);
+        if (headdata[2] == 0)
+        {
+          negative = false;
+        }
+        else
+          negative = true;
+        //      if(negative){
+        //        Serial.println("negative is true");
+        //      }
+        //      Serial.println();
+        if (negative && (headdata[0] > 0))
+        { // change number depending on how data array is set up, need to get negative, absolute, and
+          turnspeed = 40;
+          Serial.println("first if");
+        }
+        else if ((headdata[0] > 0))
+        {
+          turnspeed = 140;
+          Serial.println("second if");
+        }
+        else
+        {
+          turnspeed = 90;
+          Serial.println("else");
+        }
+        headServo.write(turnspeed);
+        //        headServo.write(180);
+
+        Serial.print("turnspeed: ");
+        Serial.println(turnspeed);
       }
+
+      // ================================ Motors ================================
+
       else
       {
-        turnspeed = 90;
-        Serial.println("else");
-      }
-      headServo.write(turnspeed);
-      //        headServo.write(180);
+        num[0] = data[1];
+        num[1] = data[2];
+        num[2] = data[3];
+        num[3] = data[4];
+        num[4] = data[5];
+        float temp_left = atof(num);
+        if (temp_left == 0)
+        {
+          zero_flagL = 1;
+        }
+        else if (abs(temp_left) <= 1)
+        {
+          left = temp_left; // only update value if it is valid (between -1 and 1)
+          zero_flagL = 0;
+        }
 
-      Serial.print("turnspeed: ");
-      Serial.println(turnspeed);
+        num[0] = data[7];
+        num[1] = data[8];
+        num[2] = data[9];
+        num[3] = data[10];
+        num[4] = data[11];
+        float temp_right = atof(num);
+        if (temp_right == 0)
+        {
+          zero_flagR = 1;
+        }
+        else if (abs(temp_right) <= 1)
+        {
+          right = temp_right; // only update value if it is valid (between -1 and 1)
+          zero_flagR = 0;
+        }
+
+        for (int i = 0; i < 13; i++)
+          Serial.print(data[i]);
+      }
+      Serial.println();
     }
-
-    // ================================ Motors ================================
-
-    else
-    {
-      num[0] = data[1];
-      num[1] = data[2];
-      num[2] = data[3];
-      num[3] = data[4];
-      num[4] = data[5];
-      float temp_left = atof(num);
-      if (temp_left == 0)
-      {
-        zero_flagL = 1;
-      }
-      else if (abs(temp_left) <= 1)
-      {
-        left = temp_left; // only update value if it is valid (between -1 and 1)
-        zero_flagL = 0;
-      }
-
-      num[0] = data[7];
-      num[1] = data[8];
-      num[2] = data[9];
-      num[3] = data[10];
-      num[4] = data[11];
-      float temp_right = atof(num);
-      if (temp_right == 0)
-      {
-        zero_flagR = 1;
-      }
-      else if (abs(temp_right) <= 1)
-      {
-        right = temp_right; // only update value if it is valid (between -1 and 1)
-        zero_flagR = 0;
-      }
-
-      for (int i = 0; i < 13; i++)
-        Serial.print(data[i]);
-    }
-    Serial.println();
   }
 
   if (head)
@@ -282,12 +282,10 @@ void loop()
 
     //  Serial.println("hello");
 
-    /**
     left_pwm = PID_to_pwm(pid_output_L+pid_setpoint_L);
     right_pwm = PID_to_pwm(pid_output_R+pid_setpoint_R);
-    */
-    left_pwm = 100;
-    right_pwm = 100;
+    //left_pwm = 100;
+    //right_pwm = 100;
 
     if (zero_flagL && zero_flagR)
     {
@@ -319,4 +317,5 @@ void loop()
 
     counter++;
   }
+  
 }
