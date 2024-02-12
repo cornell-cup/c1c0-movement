@@ -41,6 +41,11 @@ int32_t x = 1000;
 int i = 0;
 uint32_t data_len = 13;
 
+// r2protocol - arduino to jetson
+char msg[4] = "ack";
+uint8_t msg_data_buffer[1];
+uint8_t msg_send_buffer[2048];
+
 Servo headServo; // create servo object to control a servo, currently set up for the HS-755HB servo (non-continuous rotation between 0 and 202 degrees
 bool absolute;   // variable to represent when the angle taken from the serial port is an absolute angle or a change in angle (1 if absolute)
 bool negative;   // variable to represent when a change in angle is negative (1 is negative)
@@ -132,11 +137,15 @@ void setup()
   Serial.begin(115200);
   Serial1.begin(115200);
   Serial.println("setup");
-  while (Serial1.available() > 0)
-  {
+  
+  while (Serial1.available() > 0) {
     Serial1.read();
   }
 
+  // acknowledgement message
+  for(int i = 0; i < 3; i++) {
+    msg_data_buffer[i] = (uint8_t) msg[i];
+  }
   delay(100);
 }
 
@@ -144,14 +153,16 @@ uint8_t num[5];
 
 void loop()
 {
-
+  send("LOCR", msg_data_buffer, 3, msg_send_buffer);
+  delay(250);
   // read the incoming byte
   //  headServo.write(110);
   if (Serial1.available() > 0)
   {
     Serial1.readBytes(recv_buffer, 29);
     if(r2p_decode(recv_buffer, 29, &checksum, type, data, &data_len) > 0){
-
+      // send back some acknowledgement message here
+      send("LOCR", msg_data_buffer, 3, msg_send_buffer);
       // data buffer of form: {'(' , '-' , '0' , '.' , '7' , '0' , ',' , '+' , '0' , '.' , '8' , '0' , ')'}
 
       Serial.print("Checksum: ");
@@ -317,5 +328,14 @@ void loop()
 
     counter++;
   }
-  
+}
+
+void send(char type[5], const uint8_t* msg, uint32_t msg_len, uint8_t* send_buffer) {
+  uint32_t written = r2p_encode(type, msg, msg_len, send_buffer, 2048);
+  Serial1.write(send_buffer, written);
+  Serial.println("Sent");
+  for (i=0; i<3; i++) {
+    Serial.println(send_buffer[i],HEX);
+  }
+  //Serial.println("NUMBER OF BYTES WRITTEN: " + String(written));
 }
