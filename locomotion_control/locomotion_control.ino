@@ -51,6 +51,7 @@ bool absolute;   // variable to represent when the angle taken from the serial p
 bool negative;   // variable to represent when a change in angle is negative (1 is negative)
 int turnspeed;
 bool head = false;
+bool carriage = false;
 int headdata[3];
 
 int counter = 0;
@@ -88,8 +89,15 @@ String input_str;
 PID *pid_R;
 PID *pid_L;
 
+// Create a new servo object:
+Servo myservo;
+
+// Define the servo pin:
+#define servoPin 6
+
 void setup()
 {
+  myservo.attach(servoPin);
   pinMode(pwm_pin_R, OUTPUT);
   pinMode(cw_pin_R, OUTPUT);
   pinMode(ccw_pin_R, OUTPUT);
@@ -171,9 +179,20 @@ void loop()
       if (data[0] == 'h' && data[1] == 'e' && data[2] == 'a' && data[3] == 'd')
       {
         head = true;
+        carriage = false;
       }
-      else
+
+      else if(data[0] == 'c' && data[1] == 'a' && data[2] == 'r' && data[3] == 'r'){
+          head = false;
+          carriage = true;
+          Serial.print("carriage activated");
+      }
+
+      else{
         head = false;
+        carriage = false;
+      }
+        
 
       Serial.print("Head?: ");
       Serial.println(head);
@@ -220,6 +239,18 @@ void loop()
 
         Serial.print("turnspeed: ");
         Serial.println(turnspeed);
+      }
+
+      // ++++++++++++++++++++++++++++++++ carriage ++++++++++++++++++++++++++++++
+
+      else if (carriage){
+        Serial.println(myservo.read());
+        if(myservo.read() >= 85){
+          myservo.write(60);
+        }
+        else{
+          myservo.write(88);
+        }
       }
 
       // ================================ Motors ================================
