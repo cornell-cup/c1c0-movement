@@ -60,10 +60,10 @@ bool zero_flagL;
 bool zero_flagR;
 
 // pin defintions
-int pwm_pin_R = 11;
+int pwm_pin_R = 11; //11
 int pwm_pin_L = 3;
-int cw_pin_R = 12;
-int ccw_pin_R = 13;
+int cw_pin_R = 12; //12
+int ccw_pin_R = 13;//13
 int rpm_pin_R = A0;
 int cw_pin_L = 4;
 int ccw_pin_L = 5;
@@ -93,7 +93,7 @@ PID *pid_L;
 Servo myservo;
 
 // Define the servo pin:
-#define servoPin 6
+#define servoPin 7
 
 void setup()
 {
@@ -138,7 +138,7 @@ void setup()
   counter = 0;
 
   // pins 5 and 6 are BAD!!!! Do not use
-  headServo.attach(10, 556, 2410); // attaches the servo on pin 10 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
+  headServo.attach(6, 556, 2410); // attaches the servo on pin 10 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
                                    //    headServo.attach(10);
 
   // start serial
@@ -161,7 +161,6 @@ uint8_t num[5];
 
 void loop()
 {
-  send("LOCR", msg_data_buffer, 3, msg_send_buffer);
   delay(250);
   // read the incoming byte
   //  headServo.write(110);
@@ -231,7 +230,7 @@ void loop()
         }
         else
         {
-          turnspeed = 90;
+          turnspeed = 92;
           Serial.println("else");
         }
         headServo.write(turnspeed);
