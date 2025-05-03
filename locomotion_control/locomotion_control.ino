@@ -51,6 +51,7 @@ bool absolute;   // variable to represent when the angle taken from the serial p
 bool negative;   // variable to represent when a change in angle is negative (1 is negative)
 int turnspeed;
 bool head = false;
+bool carriage = false;
 int headdata[3];
 
 int counter = 0;
@@ -59,10 +60,10 @@ bool zero_flagL;
 bool zero_flagR;
 
 // pin defintions
-int pwm_pin_R = 11;
+int pwm_pin_R = 11; //11
 int pwm_pin_L = 3;
-int cw_pin_R = 12;
-int ccw_pin_R = 13;
+int cw_pin_R = 12; //12
+int ccw_pin_R = 13;//13
 int rpm_pin_R = A0;
 int cw_pin_L = 4;
 int ccw_pin_L = 5;
@@ -88,8 +89,15 @@ String input_str;
 PID *pid_R;
 PID *pid_L;
 
+// Create a new servo object:
+Servo myservo;
+
+// Define the servo pin:
+#define servoPin 7
+
 void setup()
 {
+  myservo.attach(servoPin);
   pinMode(pwm_pin_R, OUTPUT);
   pinMode(cw_pin_R, OUTPUT);
   pinMode(ccw_pin_R, OUTPUT);
@@ -130,7 +138,7 @@ void setup()
   counter = 0;
 
   // pins 5 and 6 are BAD!!!! Do not use
-  headServo.attach(10, 556, 2410); // attaches the servo on pin 10 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
+  headServo.attach(6, 556, 2410); // attaches the servo on pin 10 to the servo object, PWM range between 556-2410 for the HS-755HB (change for different servos)
                                    //    headServo.attach(10);
 
   // start serial
@@ -153,7 +161,6 @@ uint8_t num[5];
 
 void loop()
 {
-  send("LOCR", msg_data_buffer, 3, msg_send_buffer);
   delay(250);
   // read the incoming byte
   //  headServo.write(110);
@@ -171,9 +178,20 @@ void loop()
       if (data[0] == 'h' && data[1] == 'e' && data[2] == 'a' && data[3] == 'd')
       {
         head = true;
+        carriage = false;
       }
-      else
+
+      else if(data[0] == 'c' && data[1] == 'a' && data[2] == 'r' && data[3] == 'r'){
+          head = false;
+          carriage = true;
+          Serial.print("carriage activated");
+      }
+
+      else{
         head = false;
+        carriage = false;
+      }
+        
 
       Serial.print("Head?: ");
       Serial.println(head);
@@ -212,7 +230,7 @@ void loop()
         }
         else
         {
-          turnspeed = 90;
+          turnspeed = 92;
           Serial.println("else");
         }
         headServo.write(turnspeed);
@@ -220,6 +238,18 @@ void loop()
 
         Serial.print("turnspeed: ");
         Serial.println(turnspeed);
+      }
+
+      // ++++++++++++++++++++++++++++++++ carriage ++++++++++++++++++++++++++++++
+
+      else if (carriage){
+        Serial.println(myservo.read());
+        if(myservo.read() >= 85){
+          myservo.write(60);
+        }
+        else{
+          myservo.write(88);
+        }
       }
 
       // ================================ Motors ================================
